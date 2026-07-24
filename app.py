@@ -29,12 +29,11 @@ st.markdown(
 )
 
 
-# --- 3. AMBIL DATA DENGAN OPTIMASI KECEPATAN ---
-@st.cache_data(ttl=300)  # Cache diperpanjang hingga 5 menit agar super cepat
+# --- 3. AMBIL DATA LOKAL DARI GITHUB (SUPER CEPAT) ---
+@st.cache_data
 def load_data():
-  url_csv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkCGIjm8H4oXPxsZtVLH-8CK-jpYyzfMXo_JTJVYXPJetjjJqBGFdE5wWzS-12039hC4GTNx1rNS_c/pub?output=csv"
-  # Menggunakan engine python agar parsing lebih stabil dan cepat
-  df = pd.read_csv(url_csv, engine="python", on_bad_lines="skip")
+  # Pastikan nama file CSV sesuai dengan yang di-upload ke GitHub
+  df = pd.read_csv("data_sales.csv")
 
   for col in ["Sales_Value", "Qty"]:
     if col in df.columns:
@@ -53,8 +52,7 @@ def load_data():
 
 
 try:
-  with st.spinner("Memuat data command center..."):
-    df_transaksi = load_data()
+  df_transaksi = load_data()
 
   if not df_transaksi.empty:
     st.markdown("### 🚀 Salesperson Performance & Regional Command Center")
@@ -89,7 +87,6 @@ try:
     formatted_avg = f"Rp {rata_rata_sales:,.0f}".replace(",", ".")
     formatted_qty = f"{total_qty:,.0f}"
 
-    # Grid Kartu Metrik
     col_main, col_side = st.columns([2.5, 1])
 
     with col_main:
@@ -155,7 +152,6 @@ try:
         st.divider()
       st.markdown("</div>", unsafe_allow_html=True)
 
-    # Tabel Rincian Bawah
     st.markdown(
         "<div class='panel-box'><h4>📋 Detail Papan Peringkat Toko"
         " (Leaderboard)</h4>",
@@ -199,7 +195,7 @@ try:
       st.info("Tidak ada data untuk filter yang dipilih.")
     st.markdown("</div>", unsafe_allow_html=True)
   else:
-    st.warning("Google Spreadsheet Anda terdeteksi kosong.")
+    st.warning("File CSV data terdeteksi kosong.")
 
 except Exception as e:
-  st.error(f"Gagal memuat data. Error: {e}")
+  st.error(f"Gagal memuat data lokal. Error: {e}")
