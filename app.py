@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- 2. CUSTOM CSS (TEMA FUTURISTIK / SCI-FI COMMAND CENTER) ---
+# --- 2. CUSTOM CSS (TEMA FUTURISTIK / COMMAND CENTER) ---
 st.markdown(
     """
     <style>
@@ -19,13 +19,13 @@ st.markdown(
         color: #c9d1d9;
     }
     
-    /* Kartu Metrik Sci-Fi dengan Berbagai Warna Border */
+    /* Kartu Metrik Sci-Fi dengan Berbagai Warna Neon */
     .card-green {
         background: linear-gradient(135deg, #062314 0%, #0d1b12 100%);
         border: 1px solid #10b981;
         padding: 16px;
         border-radius: 12px;
-        box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
         text-align: center;
     }
     .card-yellow {
@@ -33,7 +33,7 @@ st.markdown(
         border: 1px solid #f59e0b;
         padding: 16px;
         border-radius: 12px;
-        box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
         text-align: center;
     }
     .card-red {
@@ -41,7 +41,7 @@ st.markdown(
         border: 1px solid #ef4444;
         padding: 16px;
         border-radius: 12px;
-        box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
         text-align: center;
     }
     .card-blue {
@@ -49,20 +49,20 @@ st.markdown(
         border: 1px solid #3b82f6;
         padding: 16px;
         border-radius: 12px;
-        box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
         text-align: center;
     }
     
     .card-title {
         color: #94a3b8;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
     .card-value {
         color: #ffffff;
-        font-size: 20px;
+        font-size: 18px;
         font-weight: bold;
         margin-top: 6px;
     }
@@ -76,7 +76,7 @@ st.markdown(
         margin-bottom: 20px;
     }
     
-    h1, h2, h3 {
+    h1, h2, h3, h4 {
         color: #f0f6fc !important;
     }
     
@@ -118,9 +118,7 @@ try:
   if not df_transaksi.empty:
 
     # --- 4. HEADER & SIDEBAR FILTER ---
-    st.markdown(
-        "### 🚀 Salesperson Performance & Regional Command Center"
-    )
+    st.markdown("### 🚀 Salesperson Performance & Regional Command Center")
     st.markdown(
         "<span style='color: #8b949e; font-size: 14px;'>Pantau performa"
         " penjualan real-time, target pencapaian, dan leaderboard toko dalam"
@@ -155,11 +153,15 @@ try:
         df_filtered["Sales_Value"].mean() if not df_filtered.empty else 0
     )
 
-    # --- 5. TAMPILAN UTAMA GRID (KARTU GAYA GAMBAR KEDUA) ---
-    col_main, col_side = st.columns([2.2, 1])
+    formatted_sales = f"Rp {total_sales:,.0f}".replace(",", ".")
+    formatted_avg = f"Rp {rata_rata_sales:,.0f}".replace(",", ".")
+    formatted_qty = f"{total_qty:,.0f}"
+
+    # --- 5. TAMPILAN UTAMA GRID (KARTU GAYA COMMAND CENTER) ---
+    col_main, col_side = st.columns([2.5, 1])
 
     with col_main:
-      # Baris 5 Kartu Metrik Atas (Gaya Panel Sci-Fi)
+      # Baris Kartu Metrik Atas
       k1, k2, k3, k4, k5 = st.columns(5)
 
       with k1:
@@ -167,7 +169,7 @@ try:
             f"""
                 <div class="card-green">
                     <div class="card-title">Total Sales</div>
-                    <div class="card-value">Rp {total_sales:,.0f}".replace(",", ".")</div>
+                    <div class="card-value">{formatted_sales}</div>
                 </div>
                 """,
             unsafe_allow_html=True,
@@ -177,7 +179,7 @@ try:
             f"""
                 <div class="card-green">
                     <div class="card-title">Average Value</div>
-                    <div class="card-value">Rp {rata_rata_sales:,.0f}".replace(",", ".")</div>
+                    <div class="card-value">{formatted_avg}</div>
                 </div>
                 """,
             unsafe_allow_html=True,
@@ -187,7 +189,7 @@ try:
             f"""
                 <div class="card-yellow">
                     <div class="card-title">Total Volume</div>
-                    <div class="card-value">{total_qty:,.0f}</div>
+                    <div class="card-value">{formatted_qty}</div>
                 </div>
                 """,
             unsafe_allow_html=True,
@@ -227,9 +229,9 @@ try:
       st.markdown("</div>", unsafe_allow_html=True)
 
     with col_side:
-      # Panel Samping: Peringkat / Leaderboard Ringkas
+      # Panel Samping: Leaderboard Ringkas Toko Teratas
       st.markdown(
-          "<div class='panel-box'><h4>🏆 Leaderboard AC & Toko</h4>",
+          "<div class='panel-box'><h4>🏆 Top 5 Toko</h4>",
           unsafe_allow_html=True,
       )
       df_leaderboard = (
@@ -242,12 +244,11 @@ try:
       ).head(5)
 
       for idx, row in df_leaderboard.iterrows():
+        val_str = f"Rp {row['Sales_Value']:,.0f}".replace(",", ".")
         st.markdown(
             f"**{row['Nama_Toko']}**<br><span style='color: #8b949e; font-size:"
-            f" 12px;'>AC: {row['Nama_AC']}</span><br><span style='color:"
-            f" #10b981; font-weight: bold;'>Rp"
-            f" {row['Sales_Value']:,.0f}".replace(",", ".")
-            + "</span>",
+            f" 11px;'>AC: {row['Nama_AC']}</span><br><span style='color:"
+            f" #10b981; font-weight: bold;'>{val_str}</span>",
             unsafe_allow_html=True,
         )
         st.divider()
