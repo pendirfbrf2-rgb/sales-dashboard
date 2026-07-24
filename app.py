@@ -10,28 +10,22 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- 2. CUSTOM CSS (TEMA FUTURISTIK & COMPACT CARD) ---
+# --- 2. CUSTOM CSS ---
 st.markdown(
     """
     <style>
     .stApp { background-color: #07090e; color: #c9d1d9; }
-    
     .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 10px 4px; border-radius: 12px; height: 135px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
     .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 10px 4px; border-radius: 12px; height: 135px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
     .card-red { background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%); border: 1px solid #ef4444; padding: 10px 4px; border-radius: 12px; height: 135px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
     .card-blue { background: linear-gradient(135deg, #061a27 0%, #0d151b 100%); border: 1px solid #3b82f6; padding: 10px 4px; border-radius: 12px; height: 135px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
-    
     .card-title { color: #94a3b8; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; }
-    
     .card-section { font-size: 10px; color: #94a3b8; margin: 1px 0; }
     .card-val { font-weight: bold; color: #ffffff; font-size: 11px; }
-    
     .card-footer { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 3px; font-size: 10px; color: #94a3b8; display: flex; justify-content: center; gap: 4px; }
     .card-pct { font-weight: bold; color: #10b981; font-size: 11px; }
-    
     .panel-box { background-color: #0d1117; border: 1px solid #21262d; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
     .ac-item { padding: 4px 0px; border-bottom: 1px solid #161b22; }
-    
     h1, h2, h3, h4 { color: #f0f6fc !important; }
     [data-testid="stSidebar"] { background-color: #030407; border-right: 1px solid #21262d; }
     </style>
@@ -40,13 +34,10 @@ st.markdown(
 )
 
 
-# --- 3. AMBIL DATA LOKAL GITHUB (SUPER CEPAT TANPA LOADING) ---
+# --- 3. AMBIL DATA LOKAL ---
 @st.cache_data
 def load_data():
-  # Membaca file CSV langsung dari repository GitHub lokal
-  df = pd.read_csv("data_sales.csv")
-
-  # Membersihkan kolom angka agar aman dihitung
+  df = pd.read_csv("data_sales.csv", on_bad_lines="skip")
   cols_to_clean = ["Sales_Value", "Qty", "Target_Sales", "Target_Qty"]
   for col in cols_to_clean:
     if col in df.columns:
@@ -60,7 +51,6 @@ def load_data():
           .str.replace(r"[^\d.-]", "", regex=True)
       )
       df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
-
   return df
 
 
@@ -71,7 +61,6 @@ try:
     st.markdown("### 🚀 Salesperson Performance & Regional Command Center")
     st.divider()
 
-    # --- 4. SIDEBAR FILTER WILAYAH ---
     st.sidebar.header("🔍 Saring Wilayah")
     list_rh = ["Semua RH"] + sorted(
         df_transaksi["Regional_Head"].dropna().unique().tolist()
@@ -91,14 +80,12 @@ try:
     if selected_ac != "Semua AC":
       df_filtered = df_filtered[df_filtered["Nama_AC"] == selected_ac]
 
-    # Kalkulasi Aktual & Target dari Data
     total_sales = df_filtered["Sales_Value"].sum()
     total_qty = df_filtered["Qty"].sum()
     rata_rata_sales = (
         df_filtered["Sales_Value"].mean() if not df_filtered.empty else 0
     )
 
-    # Ambil target jika kolomnya tersedia di spreadsheet, jika tidak buat estimasi otomatis
     total_target_sales = (
         df_filtered["Target_Sales"].sum()
         if "Target_Sales" in df_filtered.columns
@@ -125,7 +112,6 @@ try:
     formatted_qty = f"{total_qty:,.0f}"
     formatted_target_qty = f"{total_target_qty:,.0f}"
 
-    # --- 5. TAMPILAN UTAMA GRID (KARTU KONTROL) ---
     col_main, col_side = st.columns([2.5, 1])
 
     with col_main:
@@ -203,7 +189,6 @@ try:
 
       st.markdown("<br>", unsafe_allow_html=True)
 
-      # --- GRAFIK INTERAKTIF PLOTLY ---
       st.markdown(
           "<div class='panel-box'><h4>📊 Analisis Performa Seluruh Toko"
           " (Digital Command View)</h4>",
@@ -249,7 +234,6 @@ try:
       st.markdown("</div>", unsafe_allow_html=True)
 
     with col_side:
-      # --- PANEL RANKING AC COMPACT ---
       st.markdown(
           "<div class='panel-box'><h4>🏆 Ranking Area Coordinator (AC)</h4>",
           unsafe_allow_html=True,
@@ -274,7 +258,6 @@ try:
         )
       st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- 6. TABEL RINCIAN LENGKAP ---
     st.markdown(
         "<div class='panel-box'><h4>📋 Detail Papan Peringkat Toko"
         " (Leaderboard)</h4>",
