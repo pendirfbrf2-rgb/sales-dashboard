@@ -250,7 +250,6 @@ if not df_transaksi.empty:
         unsafe_allow_html=True,
     )
 
-    # Agregasi data per AC untuk menghitung Achievement (%)
     df_ac = (
         df_filtered.groupby("Nama_AC")
         .agg({"Sales_Value": "sum", "Target_Sales": "sum"})
@@ -259,8 +258,6 @@ if not df_transaksi.empty:
     df_ac["Achievement"] = (
         (df_ac["Sales_Value"] / df_ac["Target_Sales"]) * 100
     ).fillna(0)
-
-    # Urutkan berdasarkan Achievement tertinggi
     df_ac_leaderboard = df_ac.sort_values(
         by="Achievement", ascending=False
     ).reset_index(drop=True)
@@ -282,13 +279,18 @@ if not df_transaksi.empty:
       )
     st.markdown("</div>", unsafe_allow_html=True)
 
-  # --- TABEL DETAIL PAPAN PERINGKAT TOKO ---
+  # --- TABEL DETAIL PAPAN PERINGKAT TOKO (BERDASARKAN ACHIEVEMENT) ---
   st.markdown(
       "<div class='panel-box'><h4>📋 Detail Papan Peringkat Toko"
-      " (Leaderboard)</h4>",
+      " (Leaderboard by Achievement)</h4>",
       unsafe_allow_html=True,
   )
-  df_toko = df_filtered.sort_values(by="Sales_Value", ascending=False).reset_index(
+
+  df_toko = df_filtered.copy()
+  df_toko["Achievement_%"] = (
+      (df_toko["Sales_Value"] / df_toko["Target_Sales"]) * 100
+  ).fillna(0)
+  df_toko = df_toko.sort_values(by="Achievement_%", ascending=False).reset_index(
       drop=True
   )
 
@@ -307,6 +309,8 @@ if not df_transaksi.empty:
 
   if not df_toko.empty:
     df_toko["Peringkat"] = df_toko.apply(tambah_lencana, axis=1)
+    # Merapikan format tampilan kolom persentase
+    df_toko["Achievement_%"] = df_toko["Achievement_%"].round(1).astype(str) + "%"
     st.dataframe(df_toko, use_container_width=True, hide_index=True)
   else:
     st.info("Data tidak ditemukan.")
