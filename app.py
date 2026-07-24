@@ -9,21 +9,18 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- 2. CUSTOM CSS (PENYESUAIAN UKURAN AGAR TIDAK KELUAR KOTAK) ---
+# --- 2. CUSTOM CSS (TEMA FUTURISTIK / COMMAND CENTER) ---
 st.markdown(
     """
     <style>
     .stApp { background-color: #07090e; color: #c9d1d9; }
     
-    /* Styling Kartu Metrik */
     .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 14px 6px; border-radius: 12px; text-align: center; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 14px 6px; border-radius: 12px; text-align: center; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .card-red { background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%); border: 1px solid #ef4444; padding: 14px 6px; border-radius: 12px; text-align: center; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .card-blue { background: linear-gradient(135deg, #061a27 0%, #0d151b 100%); border: 1px solid #3b82f6; padding: 14px 6px; border-radius: 12px; text-align: center; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     
     .card-title { color: #94a3b8; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-    
-    /* Ukuran font angka disesuaikan agar pas di dalam kotak */
     .card-value { color: #ffffff; font-size: 14px; font-weight: bold; white-space: nowrap; }
     
     .panel-box { background-color: #0d1117; border: 1px solid #21262d; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
@@ -127,14 +124,23 @@ try:
       )
 
       st.markdown("<br>", unsafe_allow_html=True)
+
+      # --- PERUBAHAN: GRAFIK BATANG TOP 10 TOKO (BERSIH & MUDAH DIBACA) ---
       st.markdown(
-          "<div class='panel-box'><h4>📊 Tren Performa Penjualan Berdasarkan"
-          " Toko</h4>",
+          "<div class='panel-box'><h4>📊 Top 10 Toko dengan Penjualan Tertinggi"
+          "</h4>",
           unsafe_allow_html=True,
       )
       if not df_filtered.empty:
-        chart_data = df_filtered.set_index("Nama_Toko")[["Sales_Value"]]
-        st.line_chart(chart_data, color="#10b981")
+        df_top10 = (
+            df_filtered.groupby("Nama_Toko")["Sales_Value"]
+            .sum()
+            .reset_index()
+            .sort_values(by="Sales_Value", ascending=False)
+            .head(10)
+        )
+        chart_data = df_top10.set_index("Nama_Toko")[["Sales_Value"]]
+        st.bar_chart(chart_data, color="#10b981")
       st.markdown("</div>", unsafe_allow_html=True)
 
     with col_side:
