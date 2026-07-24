@@ -38,8 +38,7 @@ st.markdown(
 @st.cache_data
 def load_data():
   df = pd.read_csv("data_sales.csv", on_bad_lines="skip")
-  # Membersihkan spasi pada nama kolom secara aman
-  df.columns = [str(col).strip() for col in df.columns]
+  df.columns = [str(c).strip() for c in df.columns]
 
   rename_map = {}
   for col in df.columns:
