@@ -10,25 +10,25 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- 2. CUSTOM CSS (TEMA FUTURISTIK & COMPACT CARD) ---
+# --- 2. CUSTOM CSS (PERBAIKAN AGAR TIDAK TURUN BARIS) ---
 st.markdown(
     """
     <style>
     .stApp { background-color: #07090e; color: #c9d1d9; }
     
-    /* Styling Kartu yang Lebih Luas dan Rapih */
-    .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 10px; border-radius: 12px; height: 130px; display: flex; flex-direction: column; justify-content: space-between; }
-    .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 10px; border-radius: 12px; height: 130px; display: flex; flex-direction: column; justify-content: space-between; }
-    .card-red { background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%); border: 1px solid #ef4444; padding: 10px; border-radius: 12px; height: 130px; display: flex; flex-direction: column; justify-content: space-between; }
-    .card-blue { background: linear-gradient(135deg, #061a27 0%, #0d151b 100%); border: 1px solid #3b82f6; padding: 10px; border-radius: 12px; height: 130px; display: flex; flex-direction: column; justify-content: space-between; }
+    /* Styling Kartu */
+    .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 10px 4px; border-radius: 12px; height: 135px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
+    .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 10px 4px; border-radius: 12px; height: 135px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
+    .card-red { background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%); border: 1px solid #ef4444; padding: 10px 4px; border-radius: 12px; height: 135px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
+    .card-blue { background: linear-gradient(135deg, #061a27 0%, #0d151b 100%); border: 1px solid #3b82f6; padding: 10px 4px; border-radius: 12px; height: 135px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
     
-    .card-title { color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; text-align: center; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; }
+    .card-title { color: #94a3b8; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; }
     
-    .card-row { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin: 2px 0; }
-    .card-val { font-weight: bold; color: #ffffff; }
+    .card-section { font-size: 10px; color: #94a3b8; margin: 1px 0; }
+    .card-val { font-weight: bold; color: #ffffff; font-size: 11px; }
     
-    .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px; font-size: 11px; }
-    .card-pct { font-weight: bold; color: #10b981; font-size: 13px; }
+    .card-footer { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 3px; font-size: 10px; color: #94a3b8; display: flex; justify-content: center; gap: 4px; }
+    .card-pct { font-weight: bold; color: #10b981; font-size: 11px; }
     
     .panel-box { background-color: #0d1117; border: 1px solid #21262d; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
     .ac-item { padding: 4px 0px; border-bottom: 1px solid #161b22; }
@@ -101,7 +101,7 @@ try:
     formatted_avg = f"Rp {rata_rata_sales:,.0f}".replace(",", ".")
     formatted_qty = f"{total_qty:,.0f}"
 
-    # --- 5. TAMPILAN UTAMA GRID (KARTU KONTROL FORMAT COMPACT) ---
+    # --- 5. TAMPILAN UTAMA GRID (KARTU KONTROL COMPACT & RAPI) ---
     col_main, col_side = st.columns([2.5, 1])
 
     with col_main:
@@ -117,10 +117,10 @@ try:
             <div class="card-green">
                 <div class="card-title">Total Sales</div>
                 <div>
-                    <div class="card-row"><span>Target:</span> <span class="card-val">Rp 5.610M</span></div>
-                    <div class="card-row"><span>Actual:</span> <span class="card-val">{formatted_sales}</span></div>
+                    <div class="card-section">Tgt: <span class="card-val">Rp 5.610M</span></div>
+                    <div class="card-section">Act: <span class="card-val">{formatted_sales}</span></div>
                 </div>
-                <div class="card-footer"><span>Pencapaian:</span> <span class="card-pct">{pct_sales:.1f}%</span></div>
+                <div class="card-footer"><span>Ach:</span><span class="card-pct">{pct_sales:.1f}%</span></div>
             </div>
             """,
           unsafe_allow_html=True,
@@ -131,10 +131,10 @@ try:
             <div class="card-green">
                 <div class="card-title">Average Value</div>
                 <div>
-                    <div class="card-row"><span>Target:</span> <span class="card-val">Rp 90.0M</span></div>
-                    <div class="card-row"><span>Actual:</span> <span class="card-val">{formatted_avg}</span></div>
+                    <div class="card-section">Tgt: <span class="card-val">Rp 90.0M</span></div>
+                    <div class="card-section">Act: <span class="card-val">{formatted_avg}</span></div>
                 </div>
-                <div class="card-footer"><span>Pencapaian:</span> <span class="card-pct">115.0%</span></div>
+                <div class="card-footer"><span>Ach:</span><span class="card-pct">115.0%</span></div>
             </div>
             """,
           unsafe_allow_html=True,
@@ -145,10 +145,10 @@ try:
             <div class="card-yellow">
                 <div class="card-title">Total Volume</div>
                 <div>
-                    <div class="card-row"><span>Target:</span> <span class="card-val">200.000</span></div>
-                    <div class="card-row"><span>Actual:</span> <span class="card-val">{formatted_qty}</span></div>
+                    <div class="card-section">Tgt: <span class="card-val">200.000</span></div>
+                    <div class="card-section">Act: <span class="card-val">{formatted_qty}</span></div>
                 </div>
-                <div class="card-footer"><span>Pencapaian:</span> <span class="card-pct">113.5%</span></div>
+                <div class="card-footer"><span>Ach:</span><span class="card-pct">113.5%</span></div>
             </div>
             """,
           unsafe_allow_html=True,
@@ -159,10 +159,10 @@ try:
             <div class="card-red">
                 <div class="card-title">Target Vol</div>
                 <div>
-                    <div class="card-row"><span>Target:</span> <span class="card-val">100%</span></div>
-                    <div class="card-row"><span>Actual:</span> <span class="card-val">125%</span></div>
+                    <div class="card-section">Tgt: <span class="card-val">100%</span></div>
+                    <div class="card-section">Act: <span class="card-val">125%</span></div>
                 </div>
-                <div class="card-footer"><span>Pencapaian:</span> <span class="card-pct">125.0%</span></div>
+                <div class="card-footer"><span>Ach:</span><span class="card-pct">125.0%</span></div>
             </div>
             """,
           unsafe_allow_html=True,
@@ -173,10 +173,10 @@ try:
             <div class="card-blue">
                 <div class="card-title">SPD Index</div>
                 <div>
-                    <div class="card-row"><span>Target:</span> <span class="card-val">100%</span></div>
-                    <div class="card-row"><span>Actual:</span> <span class="card-val">145%</span></div>
+                    <div class="card-section">Tgt: <span class="card-val">100%</span></div>
+                    <div class="card-section">Act: <span class="card-val">145%</span></div>
                 </div>
-                <div class="card-footer"><span>Pencapaian:</span> <span class="card-pct">145.0%</span></div>
+                <div class="card-footer"><span>Ach:</span><span class="card-pct">145.0%</span></div>
             </div>
             """,
           unsafe_allow_html=True,
