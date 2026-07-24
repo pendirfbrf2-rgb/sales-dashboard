@@ -1,6 +1,4 @@
-import gspread
 import pandas as pd
-from google.oauth2.service_account import Credentials
 import streamlit as st
 
 # --- 1. KONFIGURASI HALAMAN ---
@@ -20,32 +18,17 @@ st.markdown(
 st.divider()
 
 
-# --- 2. Koneksi & Ambil Data dari Google Sheets (Gspread) ---
+# --- 2. Ambil Data Langsung dari Google Sheets Publik ---
 @st.cache_data(ttl=60)  # Data otomatis di-refresh setiap 60 detik
-def load_data_from_gspread():
-  scope = [
-      "https://www.googleapis.com/auth/spreadsheets",
-      "https://www.googleapis.com/auth/drive",
-  ]
-
-  # Menggunakan file JSON kunci akses yang di-upload langsung ke repository GitHub
-  # (Ganti nama file di bawah ini jika nama file JSON Anda berbeda)
-  creds = Credentials.from_service_account_file(
-      "apt-deployment-503402-t9-dfd51d79f547.json", scopes=scope
-  )
-  client = gspread.authorize(creds)
-
-  # Sesuaikan dengan Judul File Google Spreadsheet Anda
-  sh = client.open("Nama_File_Google_Sheets_Anda")
-  worksheet = sh.get_worksheet(0)  # Mengambil tab pertama
-
-  data = worksheet.get_all_records()
-  df = pd.DataFrame(data)
+def load_data():
+  # Masukkan tautan ekspor CSV dari Google Sheets Anda di dalam tanda kutip di bawah ini:
+  url_csv = "MASUKKAN_LINK_PUBLISH_CSV_GOOGLE_SHEETS_ANDA_DISINI"
+  df = pd.read_csv(url_csv)
   return df
 
 
 try:
-  df_transaksi = load_data_from_gspread()
+  df_transaksi = load_data()
 
   if not df_transaksi.empty:
 
@@ -140,6 +123,5 @@ try:
 
 except Exception as e:
   st.error(
-      f"Gagal memuat data. Pastikan nama file Google Sheets di kode sudah"
-      f" sesuai dan *sharing* email sudah benar. Error: {e}"
+      f"Gagal memuat data. Pastikan tautan CSV sudah benar. Error: {e}"
   )
