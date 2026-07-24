@@ -18,11 +18,18 @@ st.markdown(
 st.divider()
 
 
-# --- 2. Ambil Data Langsung dari Google Sheets Publik ---
+# --- 2. Ambil Data Langsung dari Google Sheets Web ---
 @st.cache_data(ttl=60)  # Data otomatis di-refresh setiap 60 detik
 def load_data():
-  url_csv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkCGIjm8H4oXPxsZtVLH-8CK-jpYyzfMXo_JTJVYXPJetjjJqBGFdE5wWzS-12039hC4GTNx1rNS_c/pub?output=csv"
-  df = pd.read_csv(url_csv)
+  url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkCGIjm8H4oXPxsZtVLH-8CK-jpYyzfMXo_JTJVYXPJetjjJqBGFdE5wWzS-12039hC4GTNx1rNS_c/pubhtml"
+  tables = pd.read_html(url)
+  df = tables[0]  # Mengambil tabel pertama dari halaman web
+  
+  # Membersihkan baris/kolom pertama jika terbaca sebagai header otomatis oleh pandas
+  if len(df.columns) > 0 and not isinstance(df.columns[0], str):
+    df.columns = df.iloc[0]
+    df = df[1:].reset_index(drop=True)
+    
   return df
 
 
@@ -55,8 +62,8 @@ try:
       df_filtered = df_filtered[df_filtered["Nama_AC"] == selected_ac]
 
     # --- 4. RINGKASAN METRIK UTAMA (TOP LEVEL) ---
-    total_value = df_filtered["Sales_Value"].sum()
-    total_qty = df_filtered["Qty"].sum()
+    total_value = pd.to_numeric(df_filtered["Sales_Value"], errors='coerce').sum()
+    total_qty = pd.to_numeric(df_filtered["Qty"], errors='coerce').sum()
 
     col1, col2 = st.columns(2)
     col1.metric(
@@ -69,6 +76,10 @@ try:
 
     # --- 5. PAPAN PERINGKAT TOKO (LEADERBOARD) ---
     st.subheader("🏆 Papan Peringkat Toko (Leaderboard)")
+
+    # Konversi tipe data numerik untuk perhitungan
+    df_filtered["Sales_Value"] = pd.to_numeric(df_filtered["Sales_Value"], errors='coerce')
+    df_filtered["Qty"] = pd.to_numeric(df_filtered["Qty"], errors='coerce')
 
     # Agregasi data per Toko
     df_toko = (
@@ -122,5 +133,5 @@ try:
 
 except Exception as e:
   st.error(
-      f"Gagal memuat data. Pastikan tautan CSV sudah benar. Error: {e}"
+      f"Gagal memuat data. Pastikan format tabel di Google Sheets sudah sesuai. Error: {e}"
   )
