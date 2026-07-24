@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "apt-deployment-503402-t9",
+  "private_key_id": "dfd51d79f547eeb990122f5858db2908bfd5494e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCf1YlIXLhPC4m+\n08bFQPAZ72o9DF8dbPD5dT0GlIc3SxqgFIjMAF7PY4qOs7sAemm0Rby4FGvvwaK1\nAxABI55sdPQsV/K+614BvF0P63ZfhQETINxN1IzoKJ73BV7nRmZqbH2M8H2LcU4z\ny1EZOaiHg96AjAP2uJqAz2NVfotMyi2BHc3/QfZU6UFNpHM7RQs2JycxsijCowsy\nBlgioz+EyR1meLs8kSz8/SNPh2QjtzpdQnqQ9ei9DcKyZTBOQ/36RxdlVKFc9QAq\n0+fkVc7ZGI9CbZb30As5MDseACrt1PQKxn75jb9Ctipw9KvlErHqbUThPMxNzofC\npHKYO19LAgMBAAECggEADm6MAkYo+C4tBld966Kk61qUR6Xd0rza91NQKs9vdB0q\nbsjb3zurU+ODh8YPvQfQko/3bdGeO1xLEjgQEmJCdD2NLJHWX8nFx7dX2c+jdRV/\n1tfRPI/UF0RPsjNAcfaH2dUo8vhmBZi5/HA/xtzPbEkKZqX916GshbP0HqyZ7Fly\nfMBZdFdtqyJiEQCQcRRbzBcHq86Vzbj13gyjn/GGNP4IQMTN7LXg09RKTk+yDOu9\nwug15/Fx7bjwysK7UejLS0FXbYUR+UJ+qG/wG2M7//mW5wr89zVCjcfnAL3J/f2l\nCHcb7indxibUgRicfIvlpRJiAyFmcmg+81xieBxe3QKBgQDRE+csbVkhEZpYhlsF\nBAUyBlNjpBrpveEcx/XBbKXYZJo0+8OPbMBiqfA8VQuhgHTPFCqXS/vJDJeQhAh2\nFy2iPRCF7VU30rh31uwVDLTimcvx70F8+6TZsYGRaNsH4GfWhohOXMcfivWLL8/y\nYoWIOTwiG3YfYQAJgtSULBKCBwKBgQDDtHNW+pX3Fzj3jqbguQrm0QFkuxzKJ+rw\neAQvz1AiS8JEge/IOR9lFWBC558RU0yvkUE16fYVmiT4zsDUwAFNhovfPMBLQ6gb\nGGq1muV0NYo5aB2WPsgdACrgRplp7KDKRtO6UtnKnF0G/68MvQC0wfRfFBrWYL03\nYd2tNnUXnQKBgQCG68Ue0mHWCToFLo7GKdYAdjyR7HDBrhr7K77X13ker60jy+Rj\nRdbQ1MGG7YrX6cF3cJgbkpklIM8eH1YmfsagD6/9/S4lHAKWs0cePljscjs+IRut\nv+ad5QKsB3JxHstjkOWdTBnjrRTPgUc8L3/kbKr1h6sujLYtbRQpmldHOQKBgQCq\nbUrERBS0yRRjAWdx67MCrqB4CDpaEckXAG0k9XTjaPYUktMtmhEtBiB+IxbzD4eI\nnQYc3VHgHgx0YBitLUf1K2ZDUbRj1tdeQTUsUWfge3+T3odlf+bk2nB8Pv76r4aW\noHdhmyTuvJyGq8LVZQJoZz9YTTnR1wzwXdmeLf5qQQKBgDn5f0u+4+H9CDeOPu1l\nTi0wFSoyR2vc9HZ0kGmNpXAuCvdixF7n5u7JRHPHFshJFU41GCUfl+ThLgQSANDh\nHjJOwKP7xGrileXwHZiFEmi3B8vieW5/CLNs4mHm0Jd+z5Xxv6GvK0kopkGk8IFA\nzvZClXJgQTK+kejib9WD5mZB\n-----END PRIVATE KEY-----\n",
+  "client_email": "streamlit-sales-bot@apt-deployment-503402-t9.iam.gserviceaccount.com",
+  "client_id": "105922426920287554599",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/streamlit-sales-bot%40apt-deployment-503402-t9.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
