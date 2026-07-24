@@ -34,23 +34,35 @@ st.markdown(
 )
 
 
-# --- 3. AMBIL DATA LANGSUNG TANPA CACHE (ANTI MACET) ---
+# --- 3. AMBIL DATA DENGAN PEMETAAN NAMA KOLOM AMAN ---
 def load_data():
   try:
     df = pd.read_csv("data_sales.csv", header=0, on_bad_lines="skip")
-    expected_cols = [
-        "ID_Toko",
-        "Nama_Toko",
-        "Nama_AC",
-        "Regional_Head",
-        "Sales_Value",
-        "Target_Sales",
-        "Qty",
-        "Target_Qty",
-    ]
-    if len(df.columns) >= len(expected_cols):
-      df = df.iloc[:, : len(expected_cols)]
-      df.columns = expected_cols
+    # Bersihkan spasi pada nama kolom asli
+    df.columns = [str(c).strip() for c in df.columns]
+
+    # Pemetaan nama kolom secara fleksibel berdasarkan kemiripan teks
+    rename_map = {}
+    for col in df.columns:
+      col_lower = col.lower()
+      if "target_sales" in col_lower:
+        rename_map[col] = "Target_Sales"
+      elif "target_qty" in col_lower or "target_vol" in col_lower:
+        rename_map[col] = "Target_Qty"
+      elif "sales_value" in col_lower or col_lower == "sales":
+        rename_map[col] = "Sales_Value"
+      elif "qty" in col_lower or col_lower == "volume":
+        rename_map[col] = "Qty"
+      elif "nama_toko" in col_lower or col_lower == "toko":
+        rename_map[col] = "Nama_Toko"
+      elif "nama_ac" in col_lower or col_lower == "ac":
+        rename_map[col] = "Nama_AC"
+      elif "regional_head" in col_lower or col_lower == "rh":
+        rename_map[col] = "Regional_Head"
+      elif "id_toko" in col_lower or col_lower == "id":
+        rename_map[col] = "ID_Toko"
+
+    df = df.rename(columns=rename_map)
 
     cols_to_clean = ["Sales_Value", "Qty", "Target_Sales", "Target_Qty"]
     for col in cols_to_clean:
