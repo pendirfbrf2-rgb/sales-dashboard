@@ -29,10 +29,10 @@ st.markdown(
 )
 
 
-# --- 3. AMBIL DATA LOKAL DARI GITHUB (SUPER CEPAT) ---
+# --- 3. AMBIL DATA DARI FILE LOKAL GITHUB ---
 @st.cache_data
 def load_data():
-  # Pastikan nama file CSV sesuai dengan yang di-upload ke GitHub
+  # Pastikan file 'data_sales.csv' sudah di-upload ke repository GitHub
   df = pd.read_csv("data_sales.csv")
 
   for col in ["Sales_Value", "Qty"]:
@@ -58,6 +58,7 @@ try:
     st.markdown("### 🚀 Salesperson Performance & Regional Command Center")
     st.divider()
 
+    # --- 4. SIDEBAR FILTER WILAYAH ---
     st.sidebar.header("🔍 Saring Wilayah")
     list_rh = ["Semua RH"] + sorted(
         df_transaksi["Regional_Head"].dropna().unique().tolist()
@@ -77,6 +78,7 @@ try:
     if selected_ac != "Semua AC":
       df_filtered = df_filtered[df_filtered["Nama_AC"] == selected_ac]
 
+    # Kalkulasi Metrik
     total_sales = df_filtered["Sales_Value"].sum()
     total_qty = df_filtered["Qty"].sum()
     rata_rata_sales = (
@@ -87,6 +89,7 @@ try:
     formatted_avg = f"Rp {rata_rata_sales:,.0f}".replace(",", ".")
     formatted_qty = f"{total_qty:,.0f}"
 
+    # --- 5. TAMPILAN UTAMA GRID (KARTU KONTROL) ---
     col_main, col_side = st.columns([2.5, 1])
 
     with col_main:
@@ -152,6 +155,7 @@ try:
         st.divider()
       st.markdown("</div>", unsafe_allow_html=True)
 
+    # --- 6. TABEL RINCIAN LENGKAP ---
     st.markdown(
         "<div class='panel-box'><h4>📋 Detail Papan Peringkat Toko"
         " (Leaderboard)</h4>",
@@ -198,4 +202,7 @@ try:
     st.warning("File CSV data terdeteksi kosong.")
 
 except Exception as e:
-  st.error(f"Gagal memuat data lokal. Error: {e}")
+  st.error(
+      f"Gagal memuat data. Pastikan file 'data_sales.csv' sudah di-upload ke"
+      f" GitHub. Error: {e}"
+  )
