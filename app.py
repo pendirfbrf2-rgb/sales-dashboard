@@ -34,44 +34,40 @@ st.markdown(
 )
 
 
-# --- 3. AMBIL DATA DENGAN PEMETAAN INDEKS KOLOM AMAN ---
-@st.cache_data
+# --- 3. AMBIL DATA LANGSUNG TANPA CACHE (ANTI MACET) ---
 def load_data():
-  df = pd.read_csv("data_sales.csv", header=0, on_bad_lines="skip")
+  try:
+    df = pd.read_csv("data_sales.csv", header=0, on_bad_lines="skip")
+    expected_cols = [
+        "ID_Toko",
+        "Nama_Toko",
+        "Nama_AC",
+        "Regional_Head",
+        "Sales_Value",
+        "Target_Sales",
+        "Qty",
+        "Target_Qty",
+    ]
+    if len(df.columns) >= len(expected_cols):
+      df = df.iloc[:, : len(expected_cols)]
+      df.columns = expected_cols
 
-  # Memetakan ulang kolom secara paksa berdasarkan urutan standar Anda:
-  # 0: ID_Toko, 1: Nama_Toko, 2: Nama_AC, 3: Regional_Head, 4: Sales_Value, 5: Target_Sales, 6: Qty, 7: Target_Qty
-  expected_cols = [
-      "ID_Toko",
-      "Nama_Toko",
-      "Nama_AC",
-      "Regional_Head",
-      "Sales_Value",
-      "Target_Sales",
-      "Qty",
-      "Target_Qty",
-  ]
-  if len(df.columns) >= len(expected_cols):
-    df = df.iloc[:, : len(expected_cols)]
-    df.columns = expected_cols
-  else:
-    # Jika kurang, gunakan nama kolom apa adanya
-    pass
-
-  cols_to_clean = ["Sales_Value", "Qty", "Target_Sales", "Target_Qty"]
-  for col in cols_to_clean:
-    if col in df.columns:
-      df[col] = (
-          df[col]
-          .astype(str)
-          .str.replace("Rp", "", regex=False)
-          .str.replace("IDR", "", regex=False)
-          .str.replace(".", "", regex=False)
-          .str.replace(",", ".", regex=False)
-          .str.replace(r"[^\d.-]", "", regex=True)
-      )
-      df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
-  return df
+    cols_to_clean = ["Sales_Value", "Qty", "Target_Sales", "Target_Qty"]
+    for col in cols_to_clean:
+      if col in df.columns:
+        df[col] = (
+            df[col]
+            .astype(str)
+            .str.replace("Rp", "", regex=False)
+            .str.replace("IDR", "", regex=False)
+            .str.replace(".", "", regex=False)
+            .str.replace(",", ".", regex=False)
+            .str.replace(r"[^\d.-]", "", regex=True)
+        )
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    return df
+  except Exception:
+    return pd.DataFrame()
 
 
 try:
