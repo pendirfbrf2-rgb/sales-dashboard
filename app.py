@@ -9,17 +9,17 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- 2. CUSTOM CSS MODERN COMMAND CENTER ---
+# --- 2. TAMPILAN MODERN COMMAND CENTER ---
 st.markdown(
     """
     <style>
     .stApp { background-color: #07090e; color: #c9d1d9; }
-    .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 12px; border-radius: 12px; height: 125px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
-    .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 12px; border-radius: 12px; height: 125px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
-    .card-title { color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; }
+    .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 15px; border-radius: 12px; height: 130px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
+    .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 15px; border-radius: 12px; height: 130px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
+    .card-title { color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
     .card-section { font-size: 11px; color: #94a3b8; margin: 2px 0; }
     .card-val { font-weight: bold; color: #ffffff; font-size: 12px; }
-    .card-footer { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px; font-size: 11px; color: #94a3b8; display: flex; justify-content: center; gap: 4px; }
+    .card-footer { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 5px; font-size: 11px; color: #94a3b8; display: flex; justify-content: center; gap: 6px; }
     .card-pct { font-weight: bold; color: #10b981; font-size: 12px; }
     .panel-box { background-color: #0d1117; border: 1px solid #21262d; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
     h1, h2, h3, h4 { color: #f0f6fc !important; }
@@ -30,37 +30,36 @@ st.markdown(
 )
 
 
-# --- 3. PEMBACAAN DATA AMAN & CEPAT ---
+# --- 3. PEMBACAAN DATA PRESISI SESUAI PERMINTAAN ---
 def load_data():
   try:
     df = pd.read_csv("data_sales.csv", header=0, on_bad_lines="skip")
     df.columns = [str(c).strip() for c in df.columns]
 
+    # Pemetaan kolom persis sesuai struktur yang Anda tetapkan
     rename_map = {}
     for col in df.columns:
       c_low = col.lower()
-      # Menyesuaikan dengan persis nama kolom CSV Anda
       if "target_sales" in c_low or "targetsles" in c_low:
         rename_map[col] = "Target_Sales"
       elif "target_qty" in c_low or "targetqty" in c_low:
         rename_map[col] = "Target_Qty"
-      elif "sales_value" in c_low or c_low == "sales_value":
-        rename_map[col] = "Sales_Value"
-      elif c_low == "sales":
+      elif "sales_value" in c_low or c_low == "sales":
         rename_map[col] = "Sales_Value"
       elif "qty" in c_low:
         rename_map[col] = "Qty"
-      elif "nama_toko" in c_low or c_low == "toko":
+      elif "nama_toko" in c_low:
         rename_map[col] = "Nama_Toko"
-      elif "nama_ac" in c_low or c_low == "ac":
+      elif "nama_ac" in c_low:
         rename_map[col] = "Nama_AC"
-      elif "regional_head" in c_low or c_low == "rh":
+      elif "regional_head" in c_low:
         rename_map[col] = "Regional_Head"
       elif "id_toko" in c_low:
         rename_map[col] = "ID_Toko"
 
     df = df.rename(columns=rename_map)
 
+    # Membersihkan format angka dari simbol mata uang atau pemisah
     for col in ["Sales_Value", "Qty", "Target_Sales", "Target_Qty"]:
       if col in df.columns:
         df[col] = (
@@ -83,7 +82,7 @@ if not df_transaksi.empty:
   st.markdown("### 🚀 Salesperson Performance & Regional Command Center")
   st.divider()
 
-  # --- SIDEBAR FILTER ---
+  # --- SIDEBAR FILTER WILAYAH ---
   st.sidebar.header("🔍 Saring Wilayah")
   list_rh = ["Semua RH"] + sorted(
       df_transaksi["Regional_Head"].dropna().unique().tolist()
@@ -103,7 +102,7 @@ if not df_transaksi.empty:
   if selected_ac != "Semua AC":
     df_filtered = df_filtered[df_filtered["Nama_AC"] == selected_ac]
 
-  # --- KALKULASI METRIK ---
+  # --- KALKULASI DATA ---
   total_sales = df_filtered["Sales_Value"].sum()
   total_qty = df_filtered["Qty"].sum()
   total_target_sales = (
@@ -127,10 +126,10 @@ if not df_transaksi.empty:
   fmt_qty = f"{total_qty:,.0f}"
   fmt_tgt_qty = f"{total_target_qty:,.0f}"
 
-  # --- TAMPILAN KARTU METRIK MODERN (2 KOLOM UTAMA) ---
-  k1, k2 = st.columns(2)
+  # --- KARTU METRIK UTAMA ---
+  col1, col2 = st.columns(2)
 
-  with k1:
+  with col1:
     st.markdown(
         f"""
         <div class="card-green">
@@ -145,7 +144,7 @@ if not df_transaksi.empty:
         unsafe_allow_html=True,
     )
 
-  with k2:
+  with col2:
     st.markdown(
         f"""
         <div class="card-yellow">
@@ -162,7 +161,7 @@ if not df_transaksi.empty:
 
   st.markdown("<br>", unsafe_allow_html=True)
 
-  # --- TABEL LEADERBOARD TOKO ---
+  # --- TABEL LEADERBOARD TOKO DENGAN LENCANA ---
   st.markdown(
       "<div class='panel-box'><h4>📋 Detail Papan Peringkat Toko"
       " (Leaderboard)</h4>",
