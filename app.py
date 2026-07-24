@@ -34,10 +34,34 @@ st.markdown(
 )
 
 
-# --- 3. AMBIL DATA LOKAL ---
+# --- 3. AMBIL DATA LOKAL DENGAN PENCARIAN KOLOM FLEKSIBEL ---
 @st.cache_data
 def load_data():
   df = pd.read_csv("data_sales.csv", on_bad_lines="skip")
+  # Normalisasi nama kolom (hapus spasi, ubah ke lowercase untuk pencocokan)
+  df.columns = df.columns.str.strip()
+
+  # Pemetaan otomatis jika ada variasi penulisan kolom di CSV
+  rename_map = {}
+  for col in df.columns:
+    col_lower = col.lower()
+    if "sales_value" in col_lower or col_lower == "sales":
+      rename_map[col] = "Sales_Value"
+    elif "target_sales" in col_lower:
+      rename_map[col] = "Target_Sales"
+    elif "qty" in col_lower or col_lower == "volume":
+      rename_map[col] = "Qty"
+    elif "target_qty" in col_lower or "target_vol" in col_lower:
+      rename_map[col] = "Target_Qty"
+    elif "nama_toko" in col_lower or col_lower == "toko":
+      rename_map[col] = "Nama_Toko"
+    elif "nama_ac" in col_lower or col_lower == "ac":
+      rename_map[col] = "Nama_AC"
+    elif "regional_head" in col_lower or col_lower == "rh":
+      rename_map[col] = "Regional_Head"
+
+  df = df.rename(columns=rename_map)
+
   cols_to_clean = ["Sales_Value", "Qty", "Target_Sales", "Target_Qty"]
   for col in cols_to_clean:
     if col in df.columns:
@@ -89,12 +113,12 @@ try:
     total_target_sales = (
         df_filtered["Target_Sales"].sum()
         if "Target_Sales" in df_filtered.columns
-        else total_sales * 0.85
+        else 0
     )
     total_target_qty = (
         df_filtered["Target_Qty"].sum()
         if "Target_Qty" in df_filtered.columns
-        else total_qty * 0.90
+        else 0
     )
 
     pct_sales = (
@@ -301,7 +325,7 @@ try:
       df_toko["Peringkat"] = df_toko.apply(tambah_lencana, axis=1)
       st.dataframe(df_toko, use_container_width=True, hide_index=True)
     else:
-      st.info("Tidak ada data untuk filter yang dipilih.")
+      st.info("Test.")
     st.markdown("</div>", unsafe_allow_html=True)
   else:
     st.warning("File CSV data terdeteksi kosong.")
