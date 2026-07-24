@@ -19,18 +19,20 @@ st.markdown(
 def load_data():
   try:
     df = pd.read_csv("data_sales.csv", header=0, on_bad_lines="skip")
+    # Bersihkan seluruh nama kolom dari spasi berlebih
     df.columns = [str(c).strip() for c in df.columns]
 
     rename_map = {}
     for col in df.columns:
-      c_low = col.lower()
-      if "target_sales" in c_low:
+      c_low = col.lower().replace(" ", "_")
+      # Deteksi target sales secara fleksibel
+      if "target" in c_low and ("sales" in c_low or "val" in c_low):
         rename_map[col] = "Target_Sales"
-      elif "target_qty" in c_low or "target_vol" in c_low:
+      elif "target" in c_low and ("qty" in c_low or "vol" in c_low):
         rename_map[col] = "Target_Qty"
-      elif "sales_value" in c_low or c_low == "sales":
+      elif "sales" in c_low or c_low == "sales_value":
         rename_map[col] = "Sales_Value"
-      elif "qty" in c_low or c_low == "volume":
+      elif "qty" in c_low or "volume" in c_low:
         rename_map[col] = "Qty"
       elif "nama_toko" in c_low or c_low == "toko":
         rename_map[col] = "Nama_Toko"
