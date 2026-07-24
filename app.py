@@ -17,8 +17,6 @@ st.markdown(
     .stApp { background-color: #07090e; color: #c9d1d9; }
     .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 12px; border-radius: 12px; height: 125px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
     .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 12px; border-radius: 12px; height: 125px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
-    .card-red { background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%); border: 1px solid #ef4444; padding: 12px; border-radius: 12px; height: 125px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
-    .card-blue { background: linear-gradient(135deg, #061a27 0%, #0d151b 100%); border: 1px solid #3b82f6; padding: 12px; border-radius: 12px; height: 125px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
     .card-title { color: #94a3b8; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 3px; }
     .card-section { font-size: 10px; color: #94a3b8; margin: 1px 0; }
     .card-val { font-weight: bold; color: #ffffff; font-size: 11px; }
@@ -124,18 +122,18 @@ if not df_transaksi.empty:
   fmt_qty = f"{total_qty:,.0f}"
   fmt_tgt_qty = f"{total_target_qty:,.0f}"
 
-  # 5 Kolom Kartu Metrik di Atas
-  k1, k2, k3, k4, k5 = st.columns(5)
+  # 3 Kolom Kartu Metrik Utama yang Akurat
+  k1, k2, k3 = st.columns(3)
 
   k1.markdown(
       f"""
         <div class="card-green">
-            <div class="card-title">Total Sales</div>
+            <div class="card-title">Total Sales Performance</div>
             <div>
-                <div class="card-section">Tgt: <span class="card-val">{fmt_tgt_sales}</span></div>
-                <div class="card-section">Act: <span class="card-val">{fmt_sales}</span></div>
+                <div class="card-section">Target: <span class="card-val">{fmt_tgt_sales}</span></div>
+                <div class="card-section">Actual: <span class="card-val">{fmt_sales}</span></div>
             </div>
-            <div class="card-footer"><span>Ach:</span><span class="card-pct">{pct_sales:.1f}%</span></div>
+            <div class="card-footer"><span>Achievement:</span><span class="card-pct">{pct_sales:.1f}%</span></div>
         </div>
         """,
       unsafe_allow_html=True,
@@ -144,9 +142,9 @@ if not df_transaksi.empty:
   k2.markdown(
       f"""
         <div class="card-green">
-            <div class="card-title">Average Value</div>
+            <div class="card-title">Average Store Value</div>
             <div>
-                <div class="card-section">Store Avg</div>
+                <div class="card-section">Rata-rata per Toko</div>
                 <div class="card-section"><span class="card-val">{fmt_avg}</span></div>
             </div>
             <div class="card-footer"><span>Status:</span><span class="card-pct">Active</span></div>
@@ -158,40 +156,12 @@ if not df_transaksi.empty:
   k3.markdown(
       f"""
         <div class="card-yellow">
-            <div class="card-title">Total Volume</div>
+            <div class="card-title">Total Volume Performance</div>
             <div>
-                <div class="card-section">Tgt: <span class="card-val">{fmt_tgt_qty}</span></div>
-                <div class="card-section">Act: <span class="card-val">{fmt_qty}</span></div>
+                <div class="card-section">Target: <span class="card-val">{fmt_tgt_qty}</span></div>
+                <div class="card-section">Actual: <span class="card-val">{fmt_qty}</span></div>
             </div>
-            <div class="card-footer"><span>Ach:</span><span class="card-pct">{pct_qty:.1f}%</span></div>
-        </div>
-        """,
-      unsafe_allow_html=True,
-  )
-
-  k4.markdown(
-      """
-        <div class="card-red">
-            <div class="card-title">Target Vol</div>
-            <div>
-                <div class="card-section">Status</div>
-                <div class="card-section"><span class="card-val">Optimized</span></div>
-            </div>
-            <div class="card-footer"><span>Index:</span><span class="card-pct">100%</span></div>
-        </div>
-        """,
-      unsafe_allow_html=True,
-  )
-
-  k5.markdown(
-      """
-        <div class="card-blue">
-            <div class="card-title">SPD Index</div>
-            <div>
-                <div class="card-section">Performance</div>
-                <div class="card-section"><span class="card-val">Standard</span></div>
-            </div>
-            <div class="card-footer"><span>Ach:</span><span class="card-pct">100%</span></div>
+            <div class="card-footer"><span>Achievement:</span><span class="card-pct">{pct_qty:.1f}%</span></div>
         </div>
         """,
       unsafe_allow_html=True,
@@ -221,7 +191,6 @@ if not df_transaksi.empty:
           df_chart["Sales_Juta"].round(0).astype(int).astype(str) + " Juta"
       )
 
-      # Menggunakan skala warna bergradasi dari hijau tua ke hijau terang sesuai besar kecil nilai
       fig = px.bar(
           df_chart,
           x="Nama_Toko",
