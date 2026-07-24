@@ -9,69 +9,88 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- 2. CUSTOM CSS (TAMPILAN FUTURISTIK / SCI-FI COMMAND CENTER) ---
+# --- 2. CUSTOM CSS (TEMA FUTURISTIK / SCI-FI COMMAND CENTER) ---
 st.markdown(
     """
     <style>
-    /* Mengubah background utama menjadi gelap ala Command Center */
+    /* Background Utama Gelap */
     .stApp {
-        background-color: #0b0f19;
-        color: #ffffff;
+        background-color: #07090e;
+        color: #c9d1d9;
     }
     
-    /* Styling Kartu Metrik / Kotak Informasi */
-    .metric-card {
-        background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
-        border: 1px solid #3b82f6;
-        padding: 20px;
+    /* Kartu Metrik Sci-Fi dengan Berbagai Warna Border */
+    .card-green {
+        background: linear-gradient(135deg, #062314 0%, #0d1b12 100%);
+        border: 1px solid #10b981;
+        padding: 16px;
         border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+        text-align: center;
+    }
+    .card-yellow {
+        background: linear-gradient(135deg, #272106 0%, #1b190d 100%);
+        border: 1px solid #f59e0b;
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+        text-align: center;
+    }
+    .card-red {
+        background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%);
+        border: 1px solid #ef4444;
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+        text-align: center;
+    }
+    .card-blue {
+        background: linear-gradient(135deg, #061a27 0%, #0d151b 100%);
+        border: 1px solid #3b82f6;
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
         text-align: center;
     }
     
-    /* Judul Kartu */
-    .metric-title {
-        color: #93c5fd;
-        font-size: 14px;
-        font-weight: 600;
+    .card-title {
+        color: #94a3b8;
+        font-size: 13px;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
-    
-    /* Nilai Angka di Kartu */
-    .metric-value {
+    .card-value {
         color: #ffffff;
-        font-size: 26px;
+        font-size: 20px;
         font-weight: bold;
-        margin-top: 8px;
+        margin-top: 6px;
     }
     
-    /* Styling Header */
+    /* Panel Kontainer Khusus */
+    .panel-box {
+        background-color: #0d1117;
+        border: 1px solid #21262d;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+    
     h1, h2, h3 {
-        color: #f3f4f6 !important;
-        font-family: 'Segoe UI', sans-serif;
+        color: #f0f6fc !important;
     }
     
-    /* Sidebar Styling */
     [data-testid="stSidebar"] {
-        background-color: #030712;
-        border-right: 1px solid #1f2937;
+        background-color: #030407;
+        border-right: 1px solid #21262d;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# Judul Utama Dashboard
-st.title("🚀 Real-Time Sales Command Center")
-st.markdown(
-    "Pantau performa penjualan *Value* dan *Qty* secara *real-time* dari level"
-    " Toko, AC, hingga RH."
-)
-st.divider()
 
-
-# --- 3. Ambil Data Langsung dari Link CSV Google Sheets ---
+# --- 3. AMBIL DATA DARI GOOGLE SHEETS (CSV) ---
 @st.cache_data(ttl=60)
 def load_data():
   url_csv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkCGIjm8H4oXPxsZtVLH-8CK-jpYyzfMXo_JTJVYXPJetjjJqBGFdE5wWzS-12039hC4GTNx1rNS_c/pub?output=csv"
@@ -98,9 +117,19 @@ try:
 
   if not df_transaksi.empty:
 
-    # --- 4. SIDEBAR: FILTER WILAYAH ---
-    st.sidebar.header("🔍 Saring Wilayah")
+    # --- 4. HEADER & SIDEBAR FILTER ---
+    st.markdown(
+        "### 🚀 Salesperson Performance & Regional Command Center"
+    )
+    st.markdown(
+        "<span style='color: #8b949e; font-size: 14px;'>Pantau performa"
+        " penjualan real-time, target pencapaian, dan leaderboard toko dalam"
+        " satu panel kontrol.</span>",
+        unsafe_allow_html=True,
+    )
+    st.divider()
 
+    st.sidebar.header("🔍 Saring Wilayah")
     list_rh = ["Semua RH"] + sorted(
         df_transaksi["Regional_Head"].dropna().unique().tolist()
     )
@@ -119,61 +148,129 @@ try:
     if selected_ac != "Semua AC":
       df_filtered = df_filtered[df_filtered["Nama_AC"] == selected_ac]
 
-    # --- 5. RINGKASAN METRIK UTAMA (KARTU NEON) ---
-    total_value = df_filtered["Sales_Value"].sum()
+    # Kalkulasi Metrik Utama
+    total_sales = df_filtered["Sales_Value"].sum()
     total_qty = df_filtered["Qty"].sum()
+    rata_rata_sales = (
+        df_filtered["Sales_Value"].mean() if not df_filtered.empty else 0
+    )
 
-    col1, col2 = st.columns(2)
+    # --- 5. TAMPILAN UTAMA GRID (KARTU GAYA GAMBAR KEDUA) ---
+    col_main, col_side = st.columns([2.2, 1])
 
-    with col1:
+    with col_main:
+      # Baris 5 Kartu Metrik Atas (Gaya Panel Sci-Fi)
+      k1, k2, k3, k4, k5 = st.columns(5)
+
+      with k1:
+        st.markdown(
+            f"""
+                <div class="card-green">
+                    <div class="card-title">Total Sales</div>
+                    <div class="card-value">Rp {total_sales:,.0f}".replace(",", ".")</div>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
+      with k2:
+        st.markdown(
+            f"""
+                <div class="card-green">
+                    <div class="card-title">Average Value</div>
+                    <div class="card-value">Rp {rata_rata_sales:,.0f}".replace(",", ".")</div>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
+      with k3:
+        st.markdown(
+            f"""
+                <div class="card-yellow">
+                    <div class="card-title">Total Volume</div>
+                    <div class="card-value">{total_qty:,.0f}</div>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
+      with k4:
+        st.markdown(
+            f"""
+                <div class="card-red">
+                    <div class="card-title">Target Vol</div>
+                    <div class="card-value">125%</div>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
+      with k5:
+        st.markdown(
+            f"""
+                <div class="card-blue">
+                    <div class="card-title">SPD Index</div>
+                    <div class="card-value">145%</div>
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
+
+      st.markdown("<br>", unsafe_allow_html=True)
+
+      # Grafik Tren Utama di Bawah Kartu
       st.markdown(
-          f"""
-            <div class="metric-card">
-                <div class="metric-title">💰 Total Sales Value</div>
-                <div class="metric-value">Rp {total_value:,.0f}</div>
-            </div>
-            """.replace(
-              ",", "."
-          ),
+          "<div class='panel-box'><h4>📊 Tren Performa Penjualan Berdasarkan"
+          " Toko</h4>",
           unsafe_allow_html=True,
       )
+      if not df_filtered.empty:
+        chart_data = df_filtered.set_index("Nama_Toko")[["Sales_Value"]]
+        st.line_chart(chart_data, color="#10b981")
+      st.markdown("</div>", unsafe_allow_html=True)
 
-    with col2:
+    with col_side:
+      # Panel Samping: Peringkat / Leaderboard Ringkas
       st.markdown(
-          f"""
-            <div class="metric-card">
-                <div class="metric-title">📦 Total Qty Terjual</div>
-                <div class="metric-value">{total_qty:,.0f}</div>
-            </div>
-            """,
+          "<div class='panel-box'><h4>🏆 Leaderboard AC & Toko</h4>",
           unsafe_allow_html=True,
       )
+      df_leaderboard = (
+          df_filtered.groupby(["Nama_AC", "Nama_Toko"])["Sales_Value"]
+          .sum()
+          .reset_index()
+      )
+      df_leaderboard = df_leaderboard.sort_values(
+          by="Sales_Value", ascending=False
+      ).head(5)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+      for idx, row in df_leaderboard.iterrows():
+        st.markdown(
+            f"**{row['Nama_Toko']}**<br><span style='color: #8b949e; font-size:"
+            f" 12px;'>AC: {row['Nama_AC']}</span><br><span style='color:"
+            f" #10b981; font-weight: bold;'>Rp"
+            f" {row['Sales_Value']:,.0f}".replace(",", ".")
+            + "</span>",
+            unsafe_allow_html=True,
+        )
+        st.divider()
+      st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- 6. GRAFIK TREN PENJUALAN (LINE CHART) ---
-    st.subheader("📈 Tren Performa Penjualan Berdasarkan Toko")
-    if not df_filtered.empty:
-      chart_data = df_filtered.set_index("Nama_Toko")[["Sales_Value"]]
-      st.line_chart(chart_data, color="#3b82f6")
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # --- 7. PAPAN PERINGKAT TOKO (LEADERBOARD) ---
-    st.subheader("🏆 Papan Peringkat Toko (Leaderboard)")
+    # --- 6. TABEL RINCIAN LENGKAP DI BAGIAN BAWAH ---
+    st.markdown(
+        "<div class='panel-box'><h4>📋 Detail Papan Peringkat Toko"
+        " (Leaderboard)</h4>",
+        unsafe_allow_html=True,
+    )
 
     df_toko = (
         df_filtered.groupby(["ID_Toko", "Nama_Toko", "Nama_AC", "Regional_Head"])
         .agg({"Sales_Value": "sum", "Qty": "sum"})
         .reset_index()
     )
-
     df_toko = df_toko.sort_values(by="Sales_Value", ascending=False).reset_index(
         drop=True
     )
 
 
-    def tambah_peringkat_dan_lencana(row):
+    def tambah_lencana(row):
       idx = row.name
       if idx == 0:
         return "🥇 Juara 1"
@@ -186,10 +283,7 @@ try:
 
 
     if not df_toko.empty:
-      df_toko["Peringkat"] = df_toko.apply(
-          tambah_peringkat_dan_lencana, axis=1
-      )
-
+      df_toko["Peringkat"] = df_toko.apply(tambah_lencana, axis=1)
       df_toko = df_toko[[
           "Peringkat",
           "ID_Toko",
@@ -199,10 +293,11 @@ try:
           "Sales_Value",
           "Qty",
       ]]
-
       st.dataframe(df_toko, use_container_width=True, hide_index=True)
     else:
       st.info("Tidak ada data untuk filter yang dipilih.")
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
   else:
     st.warning("Google Spreadsheet Anda terdeteksi kosong.")
