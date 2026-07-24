@@ -29,11 +29,11 @@ st.markdown(
 )
 
 
-# --- 3. AMBIL DATA DARI FILE LOKAL GITHUB ---
-@st.cache_data
+# --- 3. AMBIL DATA DARI LINK GOOGLE SHEETS DENGAN CACHE ---
+@st.cache_data(ttl=300)
 def load_data():
-  # Pastikan file 'data_sales.csv' sudah di-upload ke repository GitHub
-  df = pd.read_csv("data_sales.csv")
+  url_csv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkCGIjm8H4oXPxsZtVLH-8CK-jpYyzfMXo_JTJVYXPJetjjJqBGFdE5wWzS-12039hC4GTNx1rNS_c/pub?output=csv"
+  df = pd.read_csv(url_csv)
 
   for col in ["Sales_Value", "Qty"]:
     if col in df.columns:
@@ -52,7 +52,8 @@ def load_data():
 
 
 try:
-  df_transaksi = load_data()
+  with st.spinner("Memuat data command center..."):
+    df_transaksi = load_data()
 
   if not df_transaksi.empty:
     st.markdown("### 🚀 Salesperson Performance & Regional Command Center")
@@ -199,10 +200,7 @@ try:
       st.info("Tidak ada data untuk filter yang dipilih.")
     st.markdown("</div>", unsafe_allow_html=True)
   else:
-    st.warning("File CSV data terdeteksi kosong.")
+    st.warning("Google Spreadsheet Anda terdeteksi kosong.")
 
 except Exception as e:
-  st.error(
-      f"Gagal memuat data. Pastikan file 'data_sales.csv' sudah di-upload ke"
-      f" GitHub. Error: {e}"
-  )
+  st.error(f"Gagal memuat data. Error: {e}")
