@@ -23,6 +23,20 @@ st.divider()
 def load_data():
   url_csv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkCGIjm8H4oXPxsZtVLH-8CK-jpYyzfMXo_JTJVYXPJetjjJqBGFdE5wWzS-12039hC4GTNx1rNS_c/pub?output=csv"
   df = pd.read_csv(url_csv)
+  
+  # Membersihkan format teks angka jika ada simbol mata uang atau koma
+  for col in ["Sales_Value", "Qty"]:
+    if col in df.columns:
+      df[col] = (
+          df[col]
+          .astype(str)
+          .str.replace("Rp", "", regex=False)
+          .str.replace(".", "", regex=False)
+          .str.replace(",", ".", regex=False)
+          .str.strip()
+      )
+      df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+      
   return df
 
 
