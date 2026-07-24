@@ -34,14 +34,13 @@ st.markdown(
 )
 
 
-# --- 3. AMBIL DATA LOKAL DENGAN PENCARIAN KOLOM FLEKSIBEL ---
+# --- 3. AMBIL DATA LOKAL ---
 @st.cache_data
 def load_data():
   df = pd.read_csv("data_sales.csv", on_bad_lines="skip")
-  # Normalisasi nama kolom (hapus spasi, ubah ke lowercase untuk pencocokan)
-  df.columns = df.columns.str.strip()
+  # Membersihkan spasi pada nama kolom dengan benar
+  df.columns = [str(col).strip() for col in df.columns]
 
-  # Pemetaan otomatis jika ada variasi penulisan kolom di CSV
   rename_map = {}
   for col in df.columns:
     col_lower = col.lower()
@@ -325,7 +324,7 @@ try:
       df_toko["Peringkat"] = df_toko.apply(tambah_lencana, axis=1)
       st.dataframe(df_toko, use_container_width=True, hide_index=True)
     else:
-      st.info("Test.")
+      st.info("Data tidak ditemukan.")
     st.markdown("</div>", unsafe_allow_html=True)
   else:
     st.warning("File CSV data terdeteksi kosong.")
