@@ -21,8 +21,7 @@ st.divider()
 # --- 2. Ambil Data Langsung dari Google Sheets Publik ---
 @st.cache_data(ttl=60)  # Data otomatis di-refresh setiap 60 detik
 def load_data():
-  # Masukkan tautan ekspor CSV dari Google Sheets Anda di dalam tanda kutip di bawah ini:
-  url_csv = "MASUKKAN_LINK_PUBLISH_CSV_GOOGLE_SHEETS_ANDA_DISINI"
+  url_csv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkCGIjm8H4oXPxsZtVLH-8CK-jpYyzfMXo_JTJVYXPJetjjJqBGFdE5wWzS-12039hC4GTNx1rNS_c/pub?output=csv"
   df = pd.read_csv(url_csv)
   return df
 
