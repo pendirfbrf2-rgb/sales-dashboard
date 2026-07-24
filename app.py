@@ -34,31 +34,29 @@ st.markdown(
 )
 
 
-# --- 3. AMBIL DATA LOKAL ---
+# --- 3. AMBIL DATA DENGAN PEMETAAN INDEKS KOLOM AMAN ---
 @st.cache_data
 def load_data():
-  df = pd.read_csv("data_sales.csv", on_bad_lines="skip")
-  df.columns = [str(c).strip() for c in df.columns]
+  df = pd.read_csv("data_sales.csv", header=0, on_bad_lines="skip")
 
-  rename_map = {}
-  for col in df.columns:
-    col_lower = col.lower()
-    if "sales_value" in col_lower or col_lower == "sales":
-      rename_map[col] = "Sales_Value"
-    elif "target_sales" in col_lower:
-      rename_map[col] = "Target_Sales"
-    elif "qty" in col_lower or col_lower == "volume":
-      rename_map[col] = "Qty"
-    elif "target_qty" in col_lower or "target_vol" in col_lower:
-      rename_map[col] = "Target_Qty"
-    elif "nama_toko" in col_lower or col_lower == "toko":
-      rename_map[col] = "Nama_Toko"
-    elif "nama_ac" in col_lower or col_lower == "ac":
-      rename_map[col] = "Nama_AC"
-    elif "regional_head" in col_lower or col_lower == "rh":
-      rename_map[col] = "Regional_Head"
-
-  df = df.rename(columns=rename_map)
+  # Memetakan ulang kolom secara paksa berdasarkan urutan standar Anda:
+  # 0: ID_Toko, 1: Nama_Toko, 2: Nama_AC, 3: Regional_Head, 4: Sales_Value, 5: Target_Sales, 6: Qty, 7: Target_Qty
+  expected_cols = [
+      "ID_Toko",
+      "Nama_Toko",
+      "Nama_AC",
+      "Regional_Head",
+      "Sales_Value",
+      "Target_Sales",
+      "Qty",
+      "Target_Qty",
+  ]
+  if len(df.columns) >= len(expected_cols):
+    df = df.iloc[:, : len(expected_cols)]
+    df.columns = expected_cols
+  else:
+    # Jika kurang, gunakan nama kolom apa adanya
+    pass
 
   cols_to_clean = ["Sales_Value", "Qty", "Target_Sales", "Target_Qty"]
   for col in cols_to_clean:
