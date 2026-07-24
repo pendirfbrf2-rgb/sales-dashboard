@@ -52,7 +52,6 @@ def load_data():
       df = df.iloc[:, : len(expected_cols)]
       df.columns = expected_cols
 
-    # Membersihkan format angka termasuk tanda kutip dan koma ribuan CSV
     for col in ["Sales_Value", "Qty", "Target_Sales", "Target_Qty"]:
       if col in df.columns:
         df[col] = (
@@ -62,9 +61,7 @@ def load_data():
             .str.replace("Rp", "", regex=False)
             .str.replace("IDR", "", regex=False)
             .str.replace(" ", "", regex=False)
-            .str.replace(
-                ",", "", regex=False
-            )  # Menghapus koma pemisah ribuan di CSV
+            .str.replace(",", "", regex=False)
             .str.replace(r"[^\d.-]", "", regex=True)
         )
         df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
@@ -252,22 +249,33 @@ if not df_transaksi.empty:
         "<div class='panel-box'><h4>🏆 Ranking Area Coordinator (AC)</h4>",
         unsafe_allow_html=True,
     )
-    df_ac_leaderboard = (
-        df_filtered.groupby("Nama_AC")["Sales_Value"].sum().reset_index()
+
+    # Agregasi data per AC untuk menghitung Achievement (%)
+    df_ac = (
+        df_filtered.groupby("Nama_AC")
+        .agg({"Sales_Value": "sum", "Target_Sales": "sum"})
+        .reset_index()
     )
-    df_ac_leaderboard = df_ac_leaderboard.sort_values(
-        by="Sales_Value", ascending=False
-    )
+    df_ac["Achievement"] = (
+        (df_ac["Sales_Value"] / df_ac["Target_Sales"]) * 100
+    ).fillna(0)
+
+    # Urutkan berdasarkan Achievement tertinggi
+    df_ac_leaderboard = df_ac.sort_values(
+        by="Achievement", ascending=False
+    ).reset_index(drop=True)
 
     for idx, row in df_ac_leaderboard.iterrows():
+      ach_str = f"{row['Achievement']:.1f}%"
       val_str = f"Rp {row['Sales_Value']:,.0f}".replace(",", ".")
       st.markdown(
           f"""
             <div class="ac-item">
                 <div>
                     <div style="font-size: 11px; font-weight: bold; color: #f0f6fc;">#{idx+1} {row['Nama_AC']}</div>
+                    <div style="font-size: 10px; color: #94a3b8;">Act: {val_str}</div>
                 </div>
-                <div style="font-size: 11px; font-weight: bold; color: #10b981;">{val_str}</div>
+                <div style="font-size: 12px; font-weight: bold; color: #10b981;">{ach_str}</div>
             </div>
             """,
           unsafe_allow_html=True,
