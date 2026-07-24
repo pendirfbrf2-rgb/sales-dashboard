@@ -9,17 +9,21 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- 2. CUSTOM CSS (TEMA FUTURISTIK / COMMAND CENTER) ---
+# --- 2. CUSTOM CSS (PERBAIKAN UKURAN FONT KARTU) ---
 st.markdown(
     """
     <style>
     .stApp { background-color: #07090e; color: #c9d1d9; }
-    .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 16px; border-radius: 12px; text-align: center; }
-    .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 16px; border-radius: 12px; text-align: center; }
-    .card-red { background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%); border: 1px solid #ef4444; padding: 16px; border-radius: 12px; text-align: center; }
-    .card-blue { background: linear-gradient(135deg, #061a27 0%, #0d151b 100%); border: 1px solid #3b82f6; padding: 16px; border-radius: 12px; text-align: center; }
-    .card-title { color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-    .card-value { color: #ffffff; font-size: 18px; font-weight: bold; margin-top: 6px; }
+    
+    /* Styling Kartu Metrik dengan ukuran font pas agar tidak turun */
+    .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 14px 8px; border-radius: 12px; text-align: center; min-height: 110px; }
+    .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 14px 8px; border-radius: 12px; text-align: center; min-height: 110px; }
+    .card-red { background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%); border: 1px solid #ef4444; padding: 14px 8px; border-radius: 12px; text-align: center; min-height: 110px; }
+    .card-blue { background: linear-gradient(135deg, #061a27 0%, #0d151b 100%); border: 1px solid #3b82f6; padding: 14px 8px; border-radius: 12px; text-align: center; min-height: 110px; }
+    
+    .card-title { color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .card-value { color: #ffffff; font-size: 15px; font-weight: bold; white-space: nowrap; }
+    
     .panel-box { background-color: #0d1117; border: 1px solid #21262d; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
     h1, h2, h3, h4 { color: #f0f6fc !important; }
     [data-testid="stSidebar"] { background-color: #030407; border-right: 1px solid #21262d; }
@@ -29,7 +33,7 @@ st.markdown(
 )
 
 
-# --- 3. AMBIL DATA DARI LINK GOOGLE SHEETS DENGAN CACHE ---
+# --- 3. AMBIL DATA DARI GOOGLE SHEETS ---
 @st.cache_data(ttl=300)
 def load_data():
   url_csv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkCGIjm8H4oXPxsZtVLH-8CK-jpYyzfMXo_JTJVYXPJetjjJqBGFdE5wWzS-12039hC4GTNx1rNS_c/pub?output=csv"
@@ -79,7 +83,6 @@ try:
     if selected_ac != "Semua AC":
       df_filtered = df_filtered[df_filtered["Nama_AC"] == selected_ac]
 
-    # Kalkulasi Metrik
     total_sales = df_filtered["Sales_Value"].sum()
     total_qty = df_filtered["Qty"].sum()
     rata_rata_sales = (
