@@ -216,11 +216,17 @@ if not df_transaksi.empty:
           .sort_values(by="Sales_Value", ascending=False)
       )
 
+      # Konversi nilai ke Juta agar teks grafiknya akurat bernilai "Juta"
+      df_chart["Sales_Juta"] = df_chart["Sales_Value"] / 1_000_000
+      df_chart["Text_Juta"] = (
+          df_chart["Sales_Juta"].round(0).astype(int).astype(str) + " Juta"
+      )
+
       fig = px.bar(
           df_chart,
           x="Nama_Toko",
           y="Sales_Value",
-          text_auto=".2s",
+          text="Text_Juta",
           color="Sales_Value",
           color_continuous_scale=[
               (0, "#065f46"),
@@ -229,6 +235,7 @@ if not df_transaksi.empty:
           ],
       )
 
+      fig.update_traces(textposition="outside")
       fig.update_layout(
           plot_bgcolor="#0d1117",
           paper_bgcolor="#0d1117",
@@ -309,7 +316,6 @@ if not df_transaksi.empty:
 
   if not df_toko.empty:
     df_toko["Peringkat"] = df_toko.apply(tambah_lencana, axis=1)
-    # Merapikan format tampilan kolom persentase
     df_toko["Achievement_%"] = df_toko["Achievement_%"].round(1).astype(str) + "%"
     st.dataframe(df_toko, use_container_width=True, hide_index=True)
   else:
