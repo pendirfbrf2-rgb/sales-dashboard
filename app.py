@@ -9,20 +9,22 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- 2. CUSTOM CSS (PERBAIKAN UKURAN FONT KARTU) ---
+# --- 2. CUSTOM CSS (PENYESUAIAN UKURAN AGAR TIDAK KELUAR KOTAK) ---
 st.markdown(
     """
     <style>
     .stApp { background-color: #07090e; color: #c9d1d9; }
     
-    /* Styling Kartu Metrik dengan ukuran font pas agar tidak turun */
-    .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 14px 8px; border-radius: 12px; text-align: center; min-height: 110px; }
-    .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 14px 8px; border-radius: 12px; text-align: center; min-height: 110px; }
-    .card-red { background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%); border: 1px solid #ef4444; padding: 14px 8px; border-radius: 12px; text-align: center; min-height: 110px; }
-    .card-blue { background: linear-gradient(135deg, #061a27 0%, #0d151b 100%); border: 1px solid #3b82f6; padding: 14px 8px; border-radius: 12px; text-align: center; min-height: 110px; }
+    /* Styling Kartu Metrik */
+    .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 14px 6px; border-radius: 12px; text-align: center; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 14px 6px; border-radius: 12px; text-align: center; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .card-red { background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%); border: 1px solid #ef4444; padding: 14px 6px; border-radius: 12px; text-align: center; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .card-blue { background: linear-gradient(135deg, #061a27 0%, #0d151b 100%); border: 1px solid #3b82f6; padding: 14px 6px; border-radius: 12px; text-align: center; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     
-    .card-title { color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-    .card-value { color: #ffffff; font-size: 15px; font-weight: bold; white-space: nowrap; }
+    .card-title { color: #94a3b8; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    
+    /* Ukuran font angka disesuaikan agar pas di dalam kotak */
+    .card-value { color: #ffffff; font-size: 14px; font-weight: bold; white-space: nowrap; }
     
     .panel-box { background-color: #0d1117; border: 1px solid #21262d; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
     h1, h2, h3, h4 { color: #f0f6fc !important; }
