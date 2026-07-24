@@ -34,7 +34,7 @@ st.markdown(
 )
 
 
-# --- 3. PEMBACAAN DAN PEMBERSIHAN ANGKA PRESISI ---
+# --- 3. PEMBACAAN DAN PEMBERSIHAN ANGKA PRESISI TINGGI ---
 def load_data():
   try:
     df = pd.read_csv("data_sales.csv", header=0, on_bad_lines="skip")
@@ -52,19 +52,19 @@ def load_data():
       df = df.iloc[:, : len(expected_cols)]
       df.columns = expected_cols
 
-    # Membersihkan format angka dari string agar konversi ke numerik sempurna
+    # Membersihkan format angka termasuk tanda kutip dan koma ribuan CSV
     for col in ["Sales_Value", "Qty", "Target_Sales", "Target_Qty"]:
       if col in df.columns:
         df[col] = (
             df[col]
             .astype(str)
+            .str.replace('"', "", regex=False)
             .str.replace("Rp", "", regex=False)
             .str.replace("IDR", "", regex=False)
+            .str.replace(" ", "", regex=False)
             .str.replace(
-                " ", "", regex=False
-            )  # Menghapus spasi tersembunyi
-            .str.replace(".", "", regex=False)  # Menghapus titik ribuan
-            .str.replace(",", ".", regex=False)  # Mengubah koma jadi titik
+                ",", "", regex=False
+            )  # Menghapus koma pemisah ribuan di CSV
             .str.replace(r"[^\d.-]", "", regex=True)
         )
         df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
