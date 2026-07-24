@@ -13,88 +13,28 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    /* Background Utama Gelap */
-    .stApp {
-        background-color: #07090e;
-        color: #c9d1d9;
-    }
-    
-    /* Kartu Metrik Sci-Fi dengan Berbagai Warna Neon */
-    .card-green {
-        background: linear-gradient(135deg, #062314 0%, #0d1b12 100%);
-        border: 1px solid #10b981;
-        padding: 16px;
-        border-radius: 12px;
-        box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
-        text-align: center;
-    }
-    .card-yellow {
-        background: linear-gradient(135deg, #272106 0%, #1b190d 100%);
-        border: 1px solid #f59e0b;
-        padding: 16px;
-        border-radius: 12px;
-        box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
-        text-align: center;
-    }
-    .card-red {
-        background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%);
-        border: 1px solid #ef4444;
-        padding: 16px;
-        border-radius: 12px;
-        box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
-        text-align: center;
-    }
-    .card-blue {
-        background: linear-gradient(135deg, #061a27 0%, #0d151b 100%);
-        border: 1px solid #3b82f6;
-        padding: 16px;
-        border-radius: 12px;
-        box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
-        text-align: center;
-    }
-    
-    .card-title {
-        color: #94a3b8;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    .card-value {
-        color: #ffffff;
-        font-size: 18px;
-        font-weight: bold;
-        margin-top: 6px;
-    }
-    
-    /* Panel Kontainer Khusus */
-    .panel-box {
-        background-color: #0d1117;
-        border: 1px solid #21262d;
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-    }
-    
-    h1, h2, h3, h4 {
-        color: #f0f6fc !important;
-    }
-    
-    [data-testid="stSidebar"] {
-        background-color: #030407;
-        border-right: 1px solid #21262d;
-    }
+    .stApp { background-color: #07090e; color: #c9d1d9; }
+    .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 16px; border-radius: 12px; text-align: center; }
+    .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 16px; border-radius: 12px; text-align: center; }
+    .card-red { background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%); border: 1px solid #ef4444; padding: 16px; border-radius: 12px; text-align: center; }
+    .card-blue { background: linear-gradient(135deg, #061a27 0%, #0d151b 100%); border: 1px solid #3b82f6; padding: 16px; border-radius: 12px; text-align: center; }
+    .card-title { color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .card-value { color: #ffffff; font-size: 18px; font-weight: bold; margin-top: 6px; }
+    .panel-box { background-color: #0d1117; border: 1px solid #21262d; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+    h1, h2, h3, h4 { color: #f0f6fc !important; }
+    [data-testid="stSidebar"] { background-color: #030407; border-right: 1px solid #21262d; }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
 
-# --- 3. AMBIL DATA DARI GOOGLE SHEETS (CSV) ---
-@st.cache_data(ttl=60)
+# --- 3. AMBIL DATA DENGAN OPTIMASI KECEPATAN ---
+@st.cache_data(ttl=300)  # Cache diperpanjang hingga 5 menit agar super cepat
 def load_data():
   url_csv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkCGIjm8H4oXPxsZtVLH-8CK-jpYyzfMXo_JTJVYXPJetjjJqBGFdE5wWzS-12039hC4GTNx1rNS_c/pub?output=csv"
-  df = pd.read_csv(url_csv)
+  # Menggunakan engine python agar parsing lebih stabil dan cepat
+  df = pd.read_csv(url_csv, engine="python", on_bad_lines="skip")
 
   for col in ["Sales_Value", "Qty"]:
     if col in df.columns:
@@ -113,18 +53,11 @@ def load_data():
 
 
 try:
-  df_transaksi = load_data()
+  with st.spinner("Memuat data command center..."):
+    df_transaksi = load_data()
 
   if not df_transaksi.empty:
-
-    # --- 4. HEADER & SIDEBAR FILTER ---
     st.markdown("### 🚀 Salesperson Performance & Regional Command Center")
-    st.markdown(
-        "<span style='color: #8b949e; font-size: 14px;'>Pantau performa"
-        " penjualan real-time, target pencapaian, dan leaderboard toko dalam"
-        " satu panel kontrol.</span>",
-        unsafe_allow_html=True,
-    )
     st.divider()
 
     st.sidebar.header("🔍 Saring Wilayah")
@@ -146,7 +79,6 @@ try:
     if selected_ac != "Semua AC":
       df_filtered = df_filtered[df_filtered["Nama_AC"] == selected_ac]
 
-    # Kalkulasi Metrik Utama
     total_sales = df_filtered["Sales_Value"].sum()
     total_qty = df_filtered["Qty"].sum()
     rata_rata_sales = (
@@ -157,67 +89,38 @@ try:
     formatted_avg = f"Rp {rata_rata_sales:,.0f}".replace(",", ".")
     formatted_qty = f"{total_qty:,.0f}"
 
-    # --- 5. TAMPILAN UTAMA GRID (KARTU GAYA COMMAND CENTER) ---
+    # Grid Kartu Metrik
     col_main, col_side = st.columns([2.5, 1])
 
     with col_main:
-      # Baris Kartu Metrik Atas
       k1, k2, k3, k4, k5 = st.columns(5)
-
-      with k1:
-        st.markdown(
-            f"""
-                <div class="card-green">
-                    <div class="card-title">Total Sales</div>
-                    <div class="card-value">{formatted_sales}</div>
-                </div>
-                """,
-            unsafe_allow_html=True,
-        )
-      with k2:
-        st.markdown(
-            f"""
-                <div class="card-green">
-                    <div class="card-title">Average Value</div>
-                    <div class="card-value">{formatted_avg}</div>
-                </div>
-                """,
-            unsafe_allow_html=True,
-        )
-      with k3:
-        st.markdown(
-            f"""
-                <div class="card-yellow">
-                    <div class="card-title">Total Volume</div>
-                    <div class="card-value">{formatted_qty}</div>
-                </div>
-                """,
-            unsafe_allow_html=True,
-        )
-      with k4:
-        st.markdown(
-            f"""
-                <div class="card-red">
-                    <div class="card-title">Target Vol</div>
-                    <div class="card-value">125%</div>
-                </div>
-                """,
-            unsafe_allow_html=True,
-        )
-      with k5:
-        st.markdown(
-            f"""
-                <div class="card-blue">
-                    <div class="card-title">SPD Index</div>
-                    <div class="card-value">145%</div>
-                </div>
-                """,
-            unsafe_allow_html=True,
-        )
+      k1.markdown(
+          f'<div class="card-green"><div class="card-title">Total'
+          f' Sales</div><div class="card-value">{formatted_sales}</div></div>',
+          unsafe_allow_html=True,
+      )
+      k2.markdown(
+          f'<div class="card-green"><div class="card-title">Average'
+          f' Value</div><div class="card-value">{formatted_avg}</div></div>',
+          unsafe_allow_html=True,
+      )
+      k3.markdown(
+          f'<div class="card-yellow"><div class="card-title">Total'
+          f' Volume</div><div class="card-value">{formatted_qty}</div></div>',
+          unsafe_allow_html=True,
+      )
+      k4.markdown(
+          '<div class="card-red"><div class="card-title">Target'
+          ' Vol</div><div class="card-value">125%</div></div>',
+          unsafe_allow_html=True,
+      )
+      k5.markdown(
+          '<div class="card-blue"><div class="card-title">SPD'
+          ' Index</div><div class="card-value">145%</div></div>',
+          unsafe_allow_html=True,
+      )
 
       st.markdown("<br>", unsafe_allow_html=True)
-
-      # Grafik Tren Utama di Bawah Kartu
       st.markdown(
           "<div class='panel-box'><h4>📊 Tren Performa Penjualan Berdasarkan"
           " Toko</h4>",
@@ -229,10 +132,8 @@ try:
       st.markdown("</div>", unsafe_allow_html=True)
 
     with col_side:
-      # Panel Samping: Leaderboard Ringkas Toko Teratas
       st.markdown(
-          "<div class='panel-box'><h4>🏆 Top 5 Toko</h4>",
-          unsafe_allow_html=True,
+          "<div class='panel-box'><h4>🏆 Top 5 Toko</h4>", unsafe_allow_html=True
       )
       df_leaderboard = (
           df_filtered.groupby(["Nama_AC", "Nama_Toko"])["Sales_Value"]
@@ -254,13 +155,12 @@ try:
         st.divider()
       st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- 6. TABEL RINCIAN LENGKAP DI BAGIAN BAWAH ---
+    # Tabel Rincian Bawah
     st.markdown(
         "<div class='panel-box'><h4>📋 Detail Papan Peringkat Toko"
         " (Leaderboard)</h4>",
         unsafe_allow_html=True,
     )
-
     df_toko = (
         df_filtered.groupby(["ID_Toko", "Nama_Toko", "Nama_AC", "Regional_Head"])
         .agg({"Sales_Value": "sum", "Qty": "sum"})
@@ -297,13 +197,9 @@ try:
       st.dataframe(df_toko, use_container_width=True, hide_index=True)
     else:
       st.info("Tidak ada data untuk filter yang dipilih.")
-
     st.markdown("</div>", unsafe_allow_html=True)
-
   else:
     st.warning("Google Spreadsheet Anda terdeteksi kosong.")
 
 except Exception as e:
-  st.error(
-      f"Gagal memuat data. Pastikan format tabel di Google Sheets sudah sesuai. Error: {e}"
-  )
+  st.error(f"Gagal memuat data. Error: {e}")
