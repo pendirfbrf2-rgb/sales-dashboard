@@ -10,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- 2. CUSTOM CSS (TEMA FUTURISTIK / COMMAND CENTER) ---
+# --- 2. CUSTOM CSS (TEMA FUTURISTIK & COMPACT PANEL) ---
 st.markdown(
     """
     <style>
@@ -25,6 +25,10 @@ st.markdown(
     .card-value { color: #ffffff; font-size: 14px; font-weight: bold; white-space: nowrap; }
     
     .panel-box { background-color: #0d1117; border: 1px solid #21262d; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+    
+    /* Styling khusus untuk list AC yang compact */
+    .ac-item { padding: 4px 0px; border-bottom: 1px solid #161b22; }
+    
     h1, h2, h3, h4 { color: #f0f6fc !important; }
     [data-testid="stSidebar"] { background-color: #030407; border-right: 1px solid #21262d; }
     </style>
@@ -172,9 +176,9 @@ try:
       st.markdown("</div>", unsafe_allow_html=True)
 
     with col_side:
-      # --- PERUBAHAN: PANEL TOP 5 AREA COORDINATOR (AC) ---
+      # --- PANEL ALL AREA COORDINATOR (COMPACT & RANKED) ---
       st.markdown(
-          "<div class='panel-box'><h4>🏆 Top 5 Area Coordinator (AC)</h4>",
+          "<div class='panel-box'><h4>🏆 Ranking Area Coordinator (AC)</h4>",
           unsafe_allow_html=True,
       )
       df_ac_leaderboard = (
@@ -182,16 +186,19 @@ try:
       )
       df_ac_leaderboard = df_ac_leaderboard.sort_values(
           by="Sales_Value", ascending=False
-      ).head(5)
+      )
 
       for idx, row in df_ac_leaderboard.iterrows():
         val_str = f"Rp {row['Sales_Value']:,.0f}".replace(",", ".")
         st.markdown(
-            f"**{idx + 1}. {row['Nama_AC']}**<br><span style='color: #10b981;"
-            f" font-weight: bold;'>{val_str}</span>",
+            f"""
+                <div class="ac-item">
+                    <div style="font-size: 13px; font-weight: bold; color: #f0f6fc;">{row['Nama_AC']}</div>
+                    <div style="font-size: 12px; font-weight: bold; color: #10b981;">{val_str}</div>
+                </div>
+                """,
             unsafe_allow_html=True,
         )
-        st.divider()
       st.markdown("</div>", unsafe_allow_html=True)
 
     # --- 6. TABEL RINCIAN LENGKAP ---
