@@ -126,7 +126,7 @@ try:
 
       st.markdown("<br>", unsafe_allow_html=True)
 
-      # --- GRAFIK INTERAKTIF PLOTLY (SEMUA TOKO, GAYA DIGITAL/NEON) ---
+      # --- GRAFIK INTERAKTIF PLOTLY (SEMUA TOKO) ---
       st.markdown(
           "<div class='panel-box'><h4>📊 Analisis Performa Seluruh Toko"
           " (Digital Command View)</h4>",
@@ -172,24 +172,23 @@ try:
       st.markdown("</div>", unsafe_allow_html=True)
 
     with col_side:
+      # --- PERUBAHAN: PANEL TOP 5 AREA COORDINATOR (AC) ---
       st.markdown(
-          "<div class='panel-box'><h4>🏆 Top 5 Toko</h4>", unsafe_allow_html=True
+          "<div class='panel-box'><h4>🏆 Top 5 Area Coordinator (AC)</h4>",
+          unsafe_allow_html=True,
       )
-      df_leaderboard = (
-          df_filtered.groupby(["Nama_AC", "Nama_Toko"])["Sales_Value"]
-          .sum()
-          .reset_index()
+      df_ac_leaderboard = (
+          df_filtered.groupby("Nama_AC")["Sales_Value"].sum().reset_index()
       )
-      df_leaderboard = df_leaderboard.sort_values(
+      df_ac_leaderboard = df_ac_leaderboard.sort_values(
           by="Sales_Value", ascending=False
       ).head(5)
 
-      for idx, row in df_leaderboard.iterrows():
+      for idx, row in df_ac_leaderboard.iterrows():
         val_str = f"Rp {row['Sales_Value']:,.0f}".replace(",", ".")
         st.markdown(
-            f"**{row['Nama_Toko']}**<br><span style='color: #8b949e; font-size:"
-            f" 11px;'>AC: {row['Nama_AC']}</span><br><span style='color:"
-            f" #10b981; font-weight: bold;'>{val_str}</span>",
+            f"**{idx + 1}. {row['Nama_AC']}**<br><span style='color: #10b981;"
+            f" font-weight: bold;'>{val_str}</span>",
             unsafe_allow_html=True,
         )
         st.divider()
