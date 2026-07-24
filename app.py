@@ -1,4 +1,5 @@
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 # --- 1. KONFIGURASI HALAMAN ---
@@ -120,27 +121,54 @@ try:
       k5.markdown(
           '<div class="card-blue"><div class="card-title">SPD'
           ' Index</div><div class="card-value">145%</div></div>',
-          unsafe_allow_html=True,
+          unsafe_allow_html=Thread_val := True,
       )
 
       st.markdown("<br>", unsafe_allow_html=True)
 
-      # --- PERUBAHAN: GRAFIK BATANG TOP 10 TOKO (BERSIH & MUDAH DIBACA) ---
+      # --- GRAFIK INTERAKTIF PLOTLY (SEMUA TOKO, GAYA DIGITAL/NEON) ---
       st.markdown(
-          "<div class='panel-box'><h4>📊 Top 10 Toko dengan Penjualan Tertinggi"
-          "</h4>",
+          "<div class='panel-box'><h4>📊 Analisis Performa Seluruh Toko"
+          " (Digital Command View)</h4>",
           unsafe_allow_html=True,
       )
       if not df_filtered.empty:
-        df_top10 = (
+        df_chart = (
             df_filtered.groupby("Nama_Toko")["Sales_Value"]
             .sum()
             .reset_index()
             .sort_values(by="Sales_Value", ascending=False)
-            .head(10)
         )
-        chart_data = df_top10.set_index("Nama_Toko")[["Sales_Value"]]
-        st.bar_chart(chart_data, color="#10b981")
+
+        fig = px.bar(
+            df_chart,
+            x="Nama_Toko",
+            y="Sales_Value",
+            text_auto=".2s",
+            color="Sales_Value",
+            color_continuous_scale=[
+                (0, "#065f46"),
+                (0.5, "#10b981"),
+                (1, "#34d399"),
+            ],
+        )
+
+        fig.update_layout(
+            plot_bgcolor="#0d1117",
+            paper_bgcolor="#0d1117",
+            font_color="#c9d1d9",
+            xaxis=dict(
+                title="", tickangle=-45, showgrid=False, color="#8b949e"
+            ),
+            yaxis=dict(
+                title="Sales Value (Rp)", showgrid=True, gridcolor="#21262d"
+            ),
+            margin=dict(l=10, r=10, t=10, b=80),
+            coloraxis_showscale=False,
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
       st.markdown("</div>", unsafe_allow_html=True)
 
     with col_side:
