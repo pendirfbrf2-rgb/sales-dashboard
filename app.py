@@ -10,13 +10,12 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --- 2. CUSTOM CSS (PERBAIKAN AGAR TIDAK TURUN BARIS) ---
+# --- 2. CUSTOM CSS (TEMA FUTURISTIK & COMPACT CARD) ---
 st.markdown(
     """
     <style>
     .stApp { background-color: #07090e; color: #c9d1d9; }
     
-    /* Styling Kartu */
     .card-green { background: linear-gradient(135deg, #062314 0%, #0d1b12 100%); border: 1px solid #10b981; padding: 10px 4px; border-radius: 12px; height: 135px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
     .card-yellow { background: linear-gradient(135deg, #272106 0%, #1b190d 100%); border: 1px solid #f59e0b; padding: 10px 4px; border-radius: 12px; height: 135px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
     .card-red { background: linear-gradient(135deg, #270606 0%, #1b0d0d 100%); border: 1px solid #ef4444; padding: 10px 4px; border-radius: 12px; height: 135px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
@@ -41,13 +40,15 @@ st.markdown(
 )
 
 
-# --- 3. AMBIL DATA DARI GOOGLE SHEETS ---
-@st.cache_data(ttl=300)
+# --- 3. AMBIL DATA LOKAL GITHUB (SUPER CEPAT TANPA LOADING) ---
+@st.cache_data
 def load_data():
-  url_csv = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkCGIjm8H4oXPxsZtVLH-8CK-jpYyzfMXo_JTJVYXPJetjjJqBGFdE5wWzS-12039hC4GTNx1rNS_c/pub?output=csv"
-  df = pd.read_csv(url_csv)
+  # Membaca file CSV langsung dari repository GitHub lokal
+  df = pd.read_csv("data_sales.csv")
 
-  for col in ["Sales_Value", "Qty"]:
+  # Membersihkan kolom angka agar aman dihitung
+  cols_to_clean = ["Sales_Value", "Qty", "Target_Sales", "Target_Qty"]
+  for col in cols_to_clean:
     if col in df.columns:
       df[col] = (
           df[col]
@@ -64,8 +65,7 @@ def load_data():
 
 
 try:
-  with st.spinner("Memuat data command center..."):
-    df_transaksi = load_data()
+  df_transaksi = load_data()
 
   if not df_transaksi.empty:
     st.markdown("### 🚀 Salesperson Performance & Regional Command Center")
@@ -91,33 +91,52 @@ try:
     if selected_ac != "Semua AC":
       df_filtered = df_filtered[df_filtered["Nama_AC"] == selected_ac]
 
+    # Kalkulasi Aktual & Target dari Data
     total_sales = df_filtered["Sales_Value"].sum()
     total_qty = df_filtered["Qty"].sum()
     rata_rata_sales = (
         df_filtered["Sales_Value"].mean() if not df_filtered.empty else 0
     )
 
+    # Ambil target jika kolomnya tersedia di spreadsheet, jika tidak buat estimasi otomatis
+    total_target_sales = (
+        df_filtered["Target_Sales"].sum()
+        if "Target_Sales" in df_filtered.columns
+        else total_sales * 0.85
+    )
+    total_target_qty = (
+        df_filtered["Target_Qty"].sum()
+        if "Target_Qty" in df_filtered.columns
+        else total_qty * 0.90
+    )
+
+    pct_sales = (
+        (total_sales / total_target_sales) * 100
+        if total_target_sales > 0
+        else 0
+    )
+    pct_qty = (
+        (total_qty / total_target_qty) * 100 if total_target_qty > 0 else 0
+    )
+
     formatted_sales = f"Rp {total_sales:,.0f}".replace(",", ".")
+    formatted_target_sales = f"Rp {total_target_sales:,.0f}".replace(",", ".")
     formatted_avg = f"Rp {rata_rata_sales:,.0f}".replace(",", ".")
     formatted_qty = f"{total_qty:,.0f}"
+    formatted_target_qty = f"{total_target_qty:,.0f}"
 
-    # --- 5. TAMPILAN UTAMA GRID (KARTU KONTROL COMPACT & RAPI) ---
+    # --- 5. TAMPILAN UTAMA GRID (KARTU KONTROL) ---
     col_main, col_side = st.columns([2.5, 1])
 
     with col_main:
       k1, k2, k3, k4, k5 = st.columns(5)
-
-      target_sales_val = total_sales * 0.85 if total_sales > 0 else 1
-      pct_sales = (
-          (total_sales / target_sales_val) * 100 if target_sales_val > 0 else 0
-      )
 
       k1.markdown(
           f"""
             <div class="card-green">
                 <div class="card-title">Total Sales</div>
                 <div>
-                    <div class="card-section">Tgt: <span class="card-val">Rp 5.610M</span></div>
+                    <div class="card-section">Tgt: <span class="card-val">{formatted_target_sales}</span></div>
                     <div class="card-section">Act: <span class="card-val">{formatted_sales}</span></div>
                 </div>
                 <div class="card-footer"><span>Ach:</span><span class="card-pct">{pct_sales:.1f}%</span></div>
@@ -145,10 +164,10 @@ try:
             <div class="card-yellow">
                 <div class="card-title">Total Volume</div>
                 <div>
-                    <div class="card-section">Tgt: <span class="card-val">200.000</span></div>
+                    <div class="card-section">Tgt: <span class="card-val">{formatted_target_qty}</span></div>
                     <div class="card-section">Act: <span class="card-val">{formatted_qty}</span></div>
                 </div>
-                <div class="card-footer"><span>Ach:</span><span class="card-pct">113.5%</span></div>
+                <div class="card-footer"><span>Ach:</span><span class="card-pct">{pct_qty:.1f}%</span></div>
             </div>
             """,
           unsafe_allow_html=True,
@@ -262,7 +281,19 @@ try:
         unsafe_allow_html=True,
     )
     df_toko = (
-        df_filtered.groupby(["ID_Toko", "Nama_Toko", "Nama_AC", "Regional_Head"])
+        df_filtered.groupby(
+            [
+                col
+                for col in [
+                    "ID_Toko",
+                    "Nama_Toko",
+                    "Nama_AC",
+                    "Regional_Head",
+                    "Target_Sales",
+                ]
+                if col in df_filtered.columns
+            ]
+        )
         .agg({"Sales_Value": "sum", "Qty": "sum"})
         .reset_index()
     )
@@ -285,21 +316,12 @@ try:
 
     if not df_toko.empty:
       df_toko["Peringkat"] = df_toko.apply(tambah_lencana, axis=1)
-      df_toko = df_toko[[
-          "Peringkat",
-          "ID_Toko",
-          "Nama_Toko",
-          "Nama_AC",
-          "Regional_Head",
-          "Sales_Value",
-          "Qty",
-      ]]
       st.dataframe(df_toko, use_container_width=True, hide_index=True)
     else:
       st.info("Tidak ada data untuk filter yang dipilih.")
     st.markdown("</div>", unsafe_allow_html=True)
   else:
-    st.warning("Google Spreadsheet Anda terdeteksi kosong.")
+    st.warning("File CSV data terdeteksi kosong.")
 
 except Exception as e:
-  st.error(f"Gagal memuat data. Error: {e}")
+  st.error(f"Gagal memuat data lokal. Error: {e}")
