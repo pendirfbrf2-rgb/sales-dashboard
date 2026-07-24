@@ -216,12 +216,12 @@ if not df_transaksi.empty:
           .sort_values(by="Sales_Value", ascending=False)
       )
 
-      # Konversi nilai ke Juta agar teks grafiknya akurat bernilai "Juta"
       df_chart["Sales_Juta"] = df_chart["Sales_Value"] / 1_000_000
       df_chart["Text_Juta"] = (
           df_chart["Sales_Juta"].round(0).astype(int).astype(str) + " Juta"
       )
 
+      # Menggunakan skala warna bergradasi dari hijau tua ke hijau terang sesuai besar kecil nilai
       fig = px.bar(
           df_chart,
           x="Nama_Toko",
@@ -229,9 +229,10 @@ if not df_transaksi.empty:
           text="Text_Juta",
           color="Sales_Value",
           color_continuous_scale=[
-              (0, "#065f46"),
-              (0.5, "#10b981"),
-              (1, "#34d399"),
+              (0.0, "#022c22"),
+              (0.3, "#047857"),
+              (0.7, "#10b981"),
+              (1.0, "#34d399"),
           ],
       )
 
